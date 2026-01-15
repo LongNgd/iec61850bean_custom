@@ -22,13 +22,11 @@ import java.util.List;
 
 public class SclTests {
 
-  private static final String SCL_FILE_PATH_1 = "src/test/resources/testModel.icd";
-  private static final String SCL_FILE_PATH_2 = "src/test/resources/testModel2.icd";
-  private static final String B431_CID_PATH = "resources/B431_F87T.cid";
+  private static final String B431_CID_PATH = "src/test/resources/B431_F87T.cid";
+  private static final String F650_ICD_PATH = "src/test/resources/F650.icd";
 
   @Test
   public void testClientServerCom() throws SclParseException {
-
     List<ServerModel> serverModelList = SclParser.parse(B431_CID_PATH);
     System.out.println("Parse successful");
   }

@@ -45,7 +45,7 @@ public class SclParser {
 
   private final Map<String, DataSet> dataSetsMap = new HashMap<>();
   private final List<LnSubDef> dataSetDefs = new ArrayList<>();
-  private final List<GooseControlBlock> gooseControlBlocks = new ArrayList<>();
+  private final List<Goose> geese = new ArrayList<>();
   private TypeDefinitions typeDefinitions;
   private Document doc;
   private String iedName;
@@ -214,12 +214,12 @@ public class SclParser {
     dataSetDefs.clear();
 
     // Add GOOSE control blocks to the server model
-    for (GooseControlBlock gcb : gooseControlBlocks) {
-      serverModel.addGooseControlBlock(gcb);
+    for (Goose gcb : geese) {
+      serverModel.addGoose(gcb);
     }
 
     // Clear the list for the next server model
-    gooseControlBlocks.clear();
+    geese.clear();
 
     return serverModel;
   }
@@ -357,9 +357,9 @@ public class SclParser {
     for (int i = 0; i < lnXmlNode.getChildNodes().getLength(); i++) {
       Node childNode = lnXmlNode.getChildNodes().item(i);
       if ("GSEControl".equals(childNode.getNodeName())) {
-        GooseControlBlock gcb = createGooseControlBlock(childNode, ref);
+        Goose gcb = createGoose(childNode, ref);
         if (gcb != null) {
-          gooseControlBlocks.add(gcb);
+          geese.add(gcb);
         }
       }
     }
@@ -724,7 +724,7 @@ public class SclParser {
     return rcbInstances;
   }
 
-  private GooseControlBlock createGooseControlBlock(Node gseControlNode, String parentRef)
+  private Goose createGoose(Node gseControlNode, String parentRef)
           throws SclParseException {
 
       NamedNodeMap attributes = gseControlNode.getAttributes();
@@ -736,8 +736,8 @@ public class SclParser {
       }
       String name = nameAttr.getNodeValue();
 
-      // Build control block reference: ldInst/lnClass/lnInst$GSEControl.name
-      String controlBlockReference = parentRef + "$" + name;
+      // Build control block reference: ldInst/lnClass/lnInst.GSEControl.name
+      String controlBlockReference = parentRef + "$GO$" + name;
 
       // Get datSet attribute (optional)
       String dataSetReference = null;
@@ -746,11 +746,11 @@ public class SclParser {
           dataSetReference = parentRef + "$" + datSetAttr.getNodeValue();
       }
 
-      // Get appID attribute (optional)
-      String applicationId = null;
-      Node appIdAttr = attributes.getNamedItem("appID");
-      if (appIdAttr != null) {
-          applicationId = appIdAttr.getNodeValue();
+      // Get gooseId attribute
+      String gooseId = null;
+      Node gooseIdAttr = attributes.getNamedItem("appID");
+      if (gooseIdAttr != null) {
+        gooseId = gooseIdAttr.getNodeValue();
       }
 
       // Get confRev attribute (optional)
@@ -777,39 +777,37 @@ public class SclParser {
       NodeList gseControlChildren = gseControlNode.getChildNodes();
       for (int i = 0; i < gseControlChildren.getLength(); i++) {
           Node child = gseControlChildren.item(i);
-          if ("Address".equals(child.getNodeName())) {
-              NodeList addressChildren = child.getChildNodes();
-              for (int j = 0; j < addressChildren.getLength(); j++) {
-                  Node addressChild = addressChildren.item(j);
-                  if ("P".equals(addressChild.getNodeName())) {
+          if ("Private".equals(child.getNodeName())) {
+              NodeList privateChildren = child.getChildNodes();
+              for (int k = 0; k < privateChildren.getLength(); k++) {
+                Node privateChild = privateChildren.item(k);
+                if ("esel:Address".equals(privateChild.getNodeName())) {
+                  NodeList addressChildren = privateChild.getChildNodes();
+                  for (int j = 0; j < addressChildren.getLength(); j++) {
+                    Node addressChild = addressChildren.item(j);
+                    if ("esel:P".equals(addressChild.getNodeName())) {
                       Node typeAttrP = addressChild.getAttributes().getNamedItem("type");
                       if (typeAttrP != null) {
-                          String pType = typeAttrP.getNodeValue();
-                          String pValue = addressChild.getTextContent();
+                        String pType = typeAttrP.getNodeValue();
+                        String pValue = addressChild.getTextContent();
 
-                          if ("MAC-Address".equals(pType)) {
-                              destinationMacAddress = pValue;
-                          } else if ("APPID".equals(pType)) {
-                              // Use from Address if available, otherwise use appID attribute
-                              if (applicationId == null) {
-                                  applicationId = pValue;
-                              }
-                          } else if ("VLAN-ID".equals(pType)) {
-                              vlanId = pValue;
-                          } else if ("VLAN-PRIORITY".equals(pType)) {
-                              vlanPriority = pValue;
+                        if ("MAC-Address".equals(pType)) {
+                          destinationMacAddress = pValue.replace("-", ":");
+                        } else if ("APPID".equals(pType)) {
+                          if (gooseId == null) {
+                            gooseId = pValue;
                           }
+                        } else if ("VLAN-ID".equals(pType)) {
+                          vlanId = pValue;
+                        } else if ("VLAN-PRIORITY".equals(pType)) {
+                          vlanPriority = pValue;
+                        }
                       }
+                    }
                   }
+                }
               }
           }
-      }
-
-      // Get goID attribute (optional) - this is the gooseID
-      String gooseId = null;
-      Node goIdAttr = gseControlNode.getAttributes().getNamedItem("goID");
-      if (goIdAttr != null) {
-          gooseId = goIdAttr.getNodeValue();
       }
 
       // Determine if enabled (assume true by default)
@@ -818,10 +816,13 @@ public class SclParser {
       // needCommissioning attribute (optional)
       String needCommissioning = null;
 
-      // Create the GooseControlBlock
-      ObjectReference objectReference = new ObjectReference(controlBlockReference);
+      // applicationId attribute (optional)
+      String applicationId = null;
 
-      return new GooseControlBlock(
+      // Create the Goose
+      ObjectReference objectReference = new ObjectReference(controlBlockReference.replace("$", "."));
+
+      return new Goose(
               objectReference,
               enabled,
               controlBlockReference,

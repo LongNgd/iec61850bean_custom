@@ -7,38 +7,20 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor
 @Getter
-public final class GooseControlBlock extends ModelNode {
+public final class Goose extends ModelNode {
 
     private final boolean enabled;
-
-    /** ldInst/lnClass/lnInst$GSEControl.name */
     private final String controlBlockReference;
-
-    /** MAC-Address */
     private final String destinationMacAddress;
-
-    /** APPID */
     private final String applicationId;
-
-    /** <GSEControl gooseID="..."> */
     private final String gooseId;
-
-    /** DataSet reference */
     private final String dataSetReference;
-
-    /** VLAN-ID */
     private final String vlanId;
-
-    /** VLAN-PRIORITY */
     private final String vlanPriority;
-
-    /** needCommissioning="true|false" */
     private final String needCommissioning;
-
-    /** confRev */
     private final String configurationRevision;
 
-    public GooseControlBlock(
+    public Goose(
             ObjectReference objectReference,
             boolean enabled,
             String controlBlockReference,
@@ -49,8 +31,7 @@ public final class GooseControlBlock extends ModelNode {
             String vlanId,
             String vlanPriority,
             String needCommissioning,
-            String configurationRevision
-    ) {
+            String configurationRevision) {
         this.objectReference = objectReference;
         this.enabled = enabled;
         this.controlBlockReference = controlBlockReference;
@@ -66,7 +47,7 @@ public final class GooseControlBlock extends ModelNode {
 
     @Override
     public ModelNode copy() {
-        return new GooseControlBlock(
+        return new Goose(
                 this.objectReference,
                 this.enabled,
                 this.controlBlockReference,
@@ -77,7 +58,34 @@ public final class GooseControlBlock extends ModelNode {
                 this.vlanId,
                 this.vlanPriority,
                 this.needCommissioning,
-                this.configurationRevision
-        );
+                this.configurationRevision);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getReference().toString());
+        sb.append("\n");
+        sb.append("enabled: ").append(enabled);
+        sb.append("\n");
+        sb.append("controlBlockReference: ").append(controlBlockReference);
+        sb.append("\n");
+        sb.append("destinationMacAddress: ").append(destinationMacAddress);
+        sb.append("\n");
+        sb.append("applicationId: ").append(applicationId);
+        sb.append("\n");
+        sb.append("gooseId: ").append(gooseId);
+        sb.append("\n");
+        sb.append("dataSetReference: ").append(dataSetReference);
+        sb.append("\n");
+        sb.append("vlanId: ").append(vlanId);
+        sb.append("\n");
+        sb.append("vlanPriority: ").append(vlanPriority);
+        sb.append("\n");
+        sb.append("needCommissioning: ").append(needCommissioning);
+        sb.append("\n");
+        sb.append("configurationRevision: ").append(configurationRevision);
+
+        return sb.toString();
     }
 }

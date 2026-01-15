@@ -31,7 +31,7 @@ public final class ServerModel extends ModelNode {
 
   private final Map<String, Urcb> urcbs = new HashMap<>();
   private final Map<String, Brcb> brcbs = new HashMap<>();
-  private final Map<String, GooseControlBlock> gooseControlBlocks = new HashMap<>();
+  private final Map<String, Goose> gooses = new HashMap<>();
 
   public ServerModel(List<LogicalDevice> logicalDevices, Collection<DataSet> dataSets) {
     children = new LinkedHashMap<>();
@@ -205,8 +205,8 @@ public final class ServerModel extends ModelNode {
     return brcbs.values();
   }
 
-  void addGooseControlBlock(GooseControlBlock gooseControlBlock) {
-    gooseControlBlocks.put(gooseControlBlock.getReference().toString(), gooseControlBlock);
+  void addGoose(Goose goose) {
+    gooses.put(goose.getReference().toString(), goose);
   }
 
   /**
@@ -216,8 +216,8 @@ public final class ServerModel extends ModelNode {
    * @return the reference to the requested GOOSE control block or null if none
    *         with the given reference is found.
    */
-  public GooseControlBlock getGooseControlBlock(String reference) {
-    return gooseControlBlocks.get(reference);
+  public Goose getGoose(String reference) {
+    return gooses.get(reference);
   }
 
   /**
@@ -225,8 +225,8 @@ public final class ServerModel extends ModelNode {
    *
    * @return a collection of all GOOSE control blocks
    */
-  public Collection<GooseControlBlock> getGooseControlBlocks() {
-    return gooseControlBlocks.values();
+  public Collection<Goose> getGooses() {
+    return gooses.values();
   }
 
   @Override
@@ -250,8 +250,8 @@ public final class ServerModel extends ModelNode {
       sb.append("\n\n").append(dataSet);
     }
 
-    sb.append("\n\n\n---------------------\nGOOSE Control Blocks:");
-    for (GooseControlBlock gcb : getGooseControlBlocks()) {
+    sb.append("\n\n\n---------------------\nGOOSE:");
+    for (Goose gcb : getGooses()) {
       sb.append("\n\n").append(gcb);
     }
 

@@ -1,6 +1,6 @@
 package com.beanit.iec61850bean.integrationtests;
 
-import com.beanit.iec61850bean.GooseControlBlock;
+import com.beanit.iec61850bean.Goose;
 import com.beanit.iec61850bean.SclParseException;
 import com.beanit.iec61850bean.SclParser;
 import com.beanit.iec61850bean.ServerModel;
@@ -23,12 +23,12 @@ public class GooseParsingTest {
         assertFalse(models.isEmpty());
 
         ServerModel model = models.get(0);
-        Collection<GooseControlBlock> gooseBlocks = model.getGooseControlBlocks();
+        Collection<Goose> gooseBlocks = model.getGooses();
 
         System.out.println("\n=== F650.icd GOOSE Control Blocks ===");
         System.out.println("Found " + gooseBlocks.size() + " GOOSE control blocks\n");
 
-        for (GooseControlBlock gcb : gooseBlocks) {
+        for (Goose gcb : gooseBlocks) {
             System.out.println("GOOSE Control Block:");
             System.out.println("  Reference: " + gcb.getControlBlockReference());
             System.out.println("  Application ID: " + gcb.getApplicationId());
@@ -48,7 +48,7 @@ public class GooseParsingTest {
 
         // Verify one of the GOOSE blocks
         boolean foundGcb01 = false;
-        for (GooseControlBlock gcb : gooseBlocks) {
+        for (Goose gcb : gooseBlocks) {
             if (gcb.getControlBlockReference().contains("gcb01")) {
                 foundGcb01 = true;
                 assertEquals("F650_GOOSE1", gcb.getApplicationId());
@@ -67,12 +67,12 @@ public class GooseParsingTest {
         assertFalse(models.isEmpty());
 
         ServerModel model = models.get(0);
-        Collection<GooseControlBlock> gooseBlocks = model.getGooseControlBlocks();
+        Collection<Goose> gooseBlocks = model.getGooses();
 
         System.out.println("\n=== B431_F87T.cid GOOSE Control Blocks ===");
         System.out.println("Found " + gooseBlocks.size() + " GOOSE control blocks\n");
 
-        for (GooseControlBlock gcb : gooseBlocks) {
+        for (Goose gcb : gooseBlocks) {
             System.out.println("GOOSE Control Block:");
             System.out.println("  Reference: " + gcb.getControlBlockReference());
             System.out.println("  Application ID: " + gcb.getApplicationId());
@@ -88,9 +88,9 @@ public class GooseParsingTest {
     public void testGooseControlBlockProperties() throws SclParseException {
         List<ServerModel> models = SclParser.parse(F650_FILE);
         ServerModel model = models.get(0);
-        Collection<GooseControlBlock> gooseBlocks = model.getGooseControlBlocks();
+        Collection<Goose> gooseBlocks = model.getGooses();
 
-        for (GooseControlBlock gcb : gooseBlocks) {
+        for (Goose gcb : gooseBlocks) {
             // Verify basic properties are set
             assertNotNull(gcb.getReference(), "Reference should not be null");
             assertNotNull(gcb.getControlBlockReference(), "Control block reference should not be null");
@@ -111,11 +111,11 @@ public class GooseParsingTest {
         ServerModel model = models.get(0);
 
         // Test getting GOOSE block by reference
-        Collection<GooseControlBlock> allBlocks = model.getGooseControlBlocks();
+        Collection<Goose> allBlocks = model.getGooses();
 
-        for (GooseControlBlock gcb : allBlocks) {
+        for (Goose gcb : allBlocks) {
             String reference = gcb.getReference().toString();
-            GooseControlBlock retrieved = model.getGooseControlBlock(reference);
+            Goose retrieved = model.getGoose(reference);
             assertNotNull(retrieved, "Should be able to retrieve GOOSE block by reference");
             assertEquals(gcb.getControlBlockReference(), retrieved.getControlBlockReference());
         }
