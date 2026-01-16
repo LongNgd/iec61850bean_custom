@@ -34,8 +34,12 @@ public final class ServerModel extends ModelNode {
   private final Map<String, Goose> gooses = new HashMap<>();
 
   public ServerModel(List<LogicalDevice> logicalDevices, Collection<DataSet> dataSets) {
+    this(null, logicalDevices, dataSets);
+  }
+
+  public ServerModel(ObjectReference objectReference, List<LogicalDevice> logicalDevices, Collection<DataSet> dataSets) {
     children = new LinkedHashMap<>();
-    objectReference = null;
+    this.objectReference = objectReference;
     for (LogicalDevice logicalDevice : logicalDevices) {
       children.put(logicalDevice.getReference().getName(), logicalDevice);
       logicalDevice.setParent(this);

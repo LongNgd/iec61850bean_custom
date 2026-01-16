@@ -113,7 +113,7 @@ public class SclParser {
         Node element = iedElements.item(i);
         String nodeName = element.getNodeName();
         if ("AccessPoint".equals(nodeName)) {
-          ServerSap serverSap = createAccessPoint(element);
+          ServerSap serverSap = createAccessPoint(iedName, element);
           if (serverSap != null) {
             serverModels.add(serverSap.serverModel);
           }
@@ -161,7 +161,7 @@ public class SclParser {
     }
   }
 
-  private ServerSap createAccessPoint(Node iedServer) throws SclParseException {
+  private ServerSap createAccessPoint(String iedName, Node iedServer) throws SclParseException {
     ServerSap serverSap = null;
 
     NodeList elements = iedServer.getChildNodes();
@@ -171,7 +171,7 @@ public class SclParser {
 
       if (element.getNodeName().equals("Server")) {
 
-        ServerModel server = createServerModel(element);
+        ServerModel server = createServerModel(iedName, element);
 
         Node namedItem = iedServer.getAttributes().getNamedItem("name");
         if (namedItem == null) {
@@ -187,7 +187,7 @@ public class SclParser {
     return serverSap;
   }
 
-  private ServerModel createServerModel(Node serverXMLNode) throws SclParseException {
+  private ServerModel createServerModel(String iedName, Node serverXMLNode) throws SclParseException {
 
     NodeList elements = serverXMLNode.getChildNodes();
     List<LogicalDevice> logicalDevices = new ArrayList<>(elements.getLength());
@@ -200,7 +200,7 @@ public class SclParser {
       }
     }
 
-    ServerModel serverModel = new ServerModel(logicalDevices, null);
+    ServerModel serverModel = new ServerModel(new ObjectReference(iedName), logicalDevices, null);
 
     dataSetsMap.clear();
 
