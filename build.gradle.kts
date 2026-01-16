@@ -1,4 +1,4 @@
-import net.ltgt.gradle.errorprone.errorprone
+
 
 plugins {
     `java-library`
@@ -8,7 +8,7 @@ plugins {
     id("biz.aQute.bnd.builder") version "5.1.1"
     id("com.diffplug.spotless") version "5.9.0"
     id("io.codearte.nexus-staging") version "0.22.0"
-    id("net.ltgt.errorprone") version "1.3.0"
+
 }
 
 var cfgJavaVersion = JavaVersion.VERSION_1_8
@@ -24,7 +24,7 @@ val sonatypeStagingProfileId: String? by project
 val cfgVersion = "1.9.1-SNAPSHOT"
 val cfgGroup = "com.beanit"
 val cfgCopyToRoot = false
-val cfgSignPom = true
+val cfgSignPom = false
 val cfgRepository: String? = sonatypeRepository
 val cfgSnapshotRepository: String? = sonatypeSnapshotRepository
 val cfgRepositoryUser: String? = sonatypeUser
@@ -135,7 +135,7 @@ configure(javaProjects) {
     apply(plugin = "eclipse")
     apply(plugin = "biz.aQute.bnd.builder")
     apply(plugin = "com.diffplug.spotless")
-    apply(plugin = "net.ltgt.errorprone")
+
 
     tasks.publish {
         enabled = false
@@ -155,19 +155,14 @@ configure(javaProjects) {
     dependencies {
         testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
         testImplementation("com.tngtech.archunit:archunit-junit5:0.15.0")
-        errorprone("com.google.errorprone:error_prone_core:2.5.1")
+
     }
 
     tasks.test {
         useJUnitPlatform()
     }
 
-    tasks.withType<JavaCompile>().configureEach {
-        options.errorprone.excludedPaths.set(".*java-gen.*")
-        if (!JavaVersion.current().isJava9Compatible) {
-            options.errorprone.isEnabled.set(false)
-        }
-    }
+
 
     afterEvaluate {
         tasks.jar {

@@ -28,6 +28,6 @@ public class SclTests {
   @Test
   public void testClientServerCom() throws SclParseException {
     List<ServerModel> serverModelList = SclParser.parse(B431_CID_PATH);
-    System.out.println("Parse successful");
+    System.out.println(serverModelList);
   }
 }
