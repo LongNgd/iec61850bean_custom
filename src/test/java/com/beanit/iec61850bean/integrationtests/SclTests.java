@@ -24,6 +24,7 @@ public class SclTests {
 
   private static final String B431_CID_PATH = "src/test/resources/B431_F87T.cid";
   private static final String F650_ICD_PATH = "src/test/resources/F650.icd";
+  private static final String TECHDAY_SCD_PATH = "src/test/resources/TechDay_160124.scd";
 
   @Test
   public void testClientServerCom() throws SclParseException {

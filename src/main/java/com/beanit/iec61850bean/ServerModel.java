@@ -78,6 +78,10 @@ public final class ServerModel extends ModelNode {
     return new ServerModel(childCopies, dataSetCopies);
   }
 
+  public ObjectReference getObjectReference() {
+    return objectReference;
+  }
+
   /**
    * Get the data set with the given reference. Return null if none is found.
    *
