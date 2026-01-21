@@ -32,6 +32,7 @@ public final class ServerModel extends ModelNode {
   private final Map<String, Urcb> urcbs = new HashMap<>();
   private final Map<String, Brcb> brcbs = new HashMap<>();
   private final Map<String, Goose> gooses = new HashMap<>();
+  private final Map<String, SettingGroup> settingGroups = new HashMap<>();
 
   public ServerModel(List<LogicalDevice> logicalDevices, Collection<DataSet> dataSets) {
     this(null, logicalDevices, dataSets);
@@ -237,6 +238,18 @@ public final class ServerModel extends ModelNode {
     return gooses.values();
   }
 
+  void addSettingGroup(SettingGroup settingGroup) {
+    settingGroups.put(settingGroup.getReference().toString(), settingGroup);
+  }
+
+  public SettingGroup getSettingGroup (String reference) {
+    return settingGroups.get(reference);
+  }
+
+  public Collection<SettingGroup> getSettingGroups() {
+    return settingGroups.values();
+  }
+
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -261,6 +274,11 @@ public final class ServerModel extends ModelNode {
     sb.append("\n\n\n---------------------\nGOOSE:");
     for (Goose gcb : getGooses()) {
       sb.append("\n\n").append(gcb);
+    }
+
+    sb.append("\n\n\n---------------------\nSetting groups:");
+    for (SettingGroup stg : getSettingGroups()) {
+      sb.append("\n\n").append(stg);
     }
 
     return sb.toString();

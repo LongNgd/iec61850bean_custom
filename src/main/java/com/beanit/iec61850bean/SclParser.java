@@ -46,6 +46,7 @@ public class SclParser {
   private final Map<String, DataSet> dataSetsMap = new HashMap<>();
   private final List<LnSubDef> dataSetDefs = new ArrayList<>();
   private final List<Goose> geese = new ArrayList<>();
+  private final List<SettingGroup> settingGroups = new ArrayList<>();
   private TypeDefinitions typeDefinitions;
   private Document doc;
   private String iedName;
@@ -221,6 +222,14 @@ public class SclParser {
     // Clear the list for the next server model
     geese.clear();
 
+    // Add Setting Groups to the server model
+    for (SettingGroup sg : settingGroups) {
+      serverModel.addSettingGroup(sg);
+    }
+
+    // Clear the list for the next server model
+    settingGroups.clear();
+
     return serverModel;
   }
 
@@ -363,6 +372,18 @@ public class SclParser {
         }
       }
     }
+
+    // look for SettingGroup definitions
+    for (int i = 0; i < lnXmlNode.getChildNodes().getLength(); i++) {
+      Node childNode = lnXmlNode.getChildNodes().item(i);
+      if ("SettingControl".equals(childNode.getNodeName())) {
+        SettingGroup stg = createSettingGroup(childNode, ref);
+        if (stg != null) {
+          settingGroups.add(stg);
+        }
+      }
+    }
+
     return lNode;
   }
 
@@ -725,115 +746,146 @@ public class SclParser {
   }
 
   private Goose createGoose(Node gseControlNode, String parentRef)
-          throws SclParseException {
+      throws SclParseException {
 
-      NamedNodeMap attributes = gseControlNode.getAttributes();
+    NamedNodeMap attributes = gseControlNode.getAttributes();
 
-      // Get name attribute (required)
-      Node nameAttr = attributes.getNamedItem("name");
-      if (nameAttr == null) {
-          throw new SclParseException("GSEControl must have a name attribute");
-      }
-      String name = nameAttr.getNodeValue();
+    // Get name attribute (required)
+    Node nameAttr = attributes.getNamedItem("name");
+    if (nameAttr == null) {
+      throw new SclParseException("GSEControl must have a name attribute");
+    }
+    String name = nameAttr.getNodeValue();
 
-      // Build control block reference: ldInst/lnClass/lnInst.GSEControl.name
-      String controlBlockReference = parentRef + "$GO$" + name;
+    // Build control block reference: ldInst/lnClass/lnInst.GSEControl.name
+    String controlBlockReference = parentRef + "$GO$" + name;
 
-      // Get datSet attribute (optional)
-      String dataSetReference = null;
-      Node datSetAttr = attributes.getNamedItem("datSet");
-      if (datSetAttr != null) {
-          dataSetReference = parentRef + "$" + datSetAttr.getNodeValue();
-      }
+    // Get datSet attribute (optional)
+    String dataSetReference = null;
+    Node datSetAttr = attributes.getNamedItem("datSet");
+    if (datSetAttr != null) {
+      dataSetReference = parentRef + "$" + datSetAttr.getNodeValue();
+    }
 
-      // Get gooseId attribute
-      String gooseId = null;
-      Node gooseIdAttr = attributes.getNamedItem("appID");
-      if (gooseIdAttr != null) {
-        gooseId = gooseIdAttr.getNodeValue();
-      }
+    // Get gooseId attribute
+    String gooseId = null;
+    Node gooseIdAttr = attributes.getNamedItem("appID");
+    if (gooseIdAttr != null) {
+      gooseId = gooseIdAttr.getNodeValue();
+    }
 
-      // Get confRev attribute (optional)
-      String configurationRevision = null;
-      Node confRevAttr = attributes.getNamedItem("confRev");
-      if (confRevAttr != null) {
-          configurationRevision = confRevAttr.getNodeValue();
-      }
+    // Get confRev attribute (optional)
+    String configurationRevision = null;
+    Node confRevAttr = attributes.getNamedItem("confRev");
+    if (confRevAttr != null) {
+      configurationRevision = confRevAttr.getNodeValue();
+    }
 
-      // Get type attribute (optional, can be "GOOSE" or "GSSE")
-      Node typeAttr = attributes.getNamedItem("type");
-      String type = typeAttr != null ? typeAttr.getNodeValue() : "GOOSE";
+    // Get type attribute (optional, can be "GOOSE" or "GSSE")
+    Node typeAttr = attributes.getNamedItem("type");
+    String type = typeAttr != null ? typeAttr.getNodeValue() : "GOOSE";
 
-      // Skip GSSE type for now, only handle GOOSE
-      if ("GSSE".equals(type)) {
-          return null;
-      }
+    // Skip GSSE type for now, only handle GOOSE
+    if ("GSSE".equals(type)) {
+      return null;
+    }
 
-      // Parse Address sub-element for MAC address, APPID, VLAN-ID, VLAN-PRIORITY
-      String destinationMacAddress = null;
-      String vlanId = null;
-      String vlanPriority = null;
+    // Parse Address sub-element for MAC address, APPID, VLAN-ID, VLAN-PRIORITY
+    String destinationMacAddress = null;
+    String vlanId = null;
+    String vlanPriority = null;
 
-      NodeList gseControlChildren = gseControlNode.getChildNodes();
-      for (int i = 0; i < gseControlChildren.getLength(); i++) {
-          Node child = gseControlChildren.item(i);
-          if ("Private".equals(child.getNodeName())) {
-              NodeList privateChildren = child.getChildNodes();
-              for (int k = 0; k < privateChildren.getLength(); k++) {
-                Node privateChild = privateChildren.item(k);
-                if ("esel:Address".equals(privateChild.getNodeName())) {
-                  NodeList addressChildren = privateChild.getChildNodes();
-                  for (int j = 0; j < addressChildren.getLength(); j++) {
-                    Node addressChild = addressChildren.item(j);
-                    if ("esel:P".equals(addressChild.getNodeName())) {
-                      Node typeAttrP = addressChild.getAttributes().getNamedItem("type");
-                      if (typeAttrP != null) {
-                        String pType = typeAttrP.getNodeValue();
-                        String pValue = addressChild.getTextContent();
+    NodeList gseControlChildren = gseControlNode.getChildNodes();
+    for (int i = 0; i < gseControlChildren.getLength(); i++) {
+      Node child = gseControlChildren.item(i);
+      if ("Private".equals(child.getNodeName())) {
+        NodeList privateChildren = child.getChildNodes();
+        for (int k = 0; k < privateChildren.getLength(); k++) {
+          Node privateChild = privateChildren.item(k);
+          if ("esel:Address".equals(privateChild.getNodeName())) {
+            NodeList addressChildren = privateChild.getChildNodes();
+            for (int j = 0; j < addressChildren.getLength(); j++) {
+              Node addressChild = addressChildren.item(j);
+              if ("esel:P".equals(addressChild.getNodeName())) {
+                Node typeAttrP = addressChild.getAttributes().getNamedItem("type");
+                if (typeAttrP != null) {
+                  String pType = typeAttrP.getNodeValue();
+                  String pValue = addressChild.getTextContent();
 
-                        if ("MAC-Address".equals(pType)) {
-                          destinationMacAddress = pValue.replace("-", ":");
-                        } else if ("APPID".equals(pType)) {
-                          if (gooseId == null) {
-                            gooseId = pValue;
-                          }
-                        } else if ("VLAN-ID".equals(pType)) {
-                          vlanId = pValue;
-                        } else if ("VLAN-PRIORITY".equals(pType)) {
-                          vlanPriority = pValue;
-                        }
-                      }
+                  if ("MAC-Address".equals(pType)) {
+                    destinationMacAddress = pValue.replace("-", ":");
+                  } else if ("APPID".equals(pType)) {
+                    if (gooseId == null) {
+                      gooseId = pValue;
                     }
+                  } else if ("VLAN-ID".equals(pType)) {
+                    vlanId = pValue;
+                  } else if ("VLAN-PRIORITY".equals(pType)) {
+                    vlanPriority = pValue;
                   }
                 }
               }
+            }
           }
+        }
       }
+    }
 
-      // Determine if enabled (assume true by default)
-      boolean enabled = true;
+    // Determine if enabled (assume true by default)
+    boolean enabled = true;
 
-      // needCommissioning attribute (optional)
-      String needCommissioning = null;
+    // needCommissioning attribute (optional)
+    String needCommissioning = null;
 
-      // applicationId attribute (optional)
-      String applicationId = null;
+    // applicationId attribute (optional)
+    String applicationId = null;
 
-      // Create the Goose
-      ObjectReference objectReference = new ObjectReference(controlBlockReference.replace("$", "."));
+    // Create the Goose
+    ObjectReference objectReference = new ObjectReference(controlBlockReference.replace("$", "."));
 
-      return new Goose(
-              objectReference,
-              enabled,
-              controlBlockReference,
-              destinationMacAddress,
-              applicationId,
-              gooseId,
-              dataSetReference,
-              vlanId,
-              vlanPriority,
-              needCommissioning,
-              configurationRevision);
+    return new Goose(
+        objectReference,
+        enabled,
+        controlBlockReference,
+        destinationMacAddress,
+        applicationId,
+        gooseId,
+        dataSetReference,
+        vlanId,
+        vlanPriority,
+        needCommissioning,
+        configurationRevision);
+  }
+
+  private SettingGroup createSettingGroup(Node settingControlNode, String parentRef) {
+    NamedNodeMap attributes = settingControlNode.getAttributes();
+    String numOfSGs = "0";
+    String actSG = "0";
+    String resvTms = null;
+
+    Node attribute = attributes.getNamedItem("numOfSGs");
+    if (attribute != null) {
+      numOfSGs = attribute.getNodeValue();
+    }
+    attribute = attributes.getNamedItem("actSG");
+    if (attribute != null) {
+      actSG = attribute.getNodeValue();
+    }
+    attribute = attributes.getNamedItem("resvTms");
+    if (attribute != null) {
+      resvTms = attribute.getNodeValue();
+    }
+
+    String controlBlock = parentRef + ".SGCB";
+
+    return new SettingGroup(
+        new ObjectReference(controlBlock),
+        controlBlock,
+        numOfSGs,
+        actSG,
+        null,
+        resvTms,
+        null);
   }
 
   private List<FcDataObject> createFcDataObjects(
