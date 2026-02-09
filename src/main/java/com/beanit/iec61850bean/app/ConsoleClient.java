@@ -327,7 +327,7 @@ public class ConsoleClient {
                       {
                         System.out.print("Set data set reference:");
                         String dataSetReference = actionProcessor.getReader().readLine();
-                        urcb.getDatSet().setValue(dataSetReference);
+                        urcb.getDataSetRef().setValue(dataSetReference);
                         List<ServiceError> serviceErrors =
                             association.setRcbValues(
                                 urcb, false, true, false, false, false, false, false, false);

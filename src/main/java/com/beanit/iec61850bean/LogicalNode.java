@@ -80,7 +80,7 @@ public final class LogicalNode extends ModelNode {
   void addUrcb(Urcb urcb, boolean addDataSet) {
     urcbs.put(urcb.getReference().getName(), urcb);
     if (addDataSet) {
-      String dataSetRef = urcb.getDatSet().getStringValue();
+      String dataSetRef = urcb.getDataSetRef().getStringValue();
       if (dataSetRef != null) {
         urcb.dataSet =
             ((ServerModel) getParent().getParent()).getDataSet(dataSetRef.replace('$', '.'));

@@ -194,7 +194,7 @@ public class Urcb extends Rcb {
 
     if (getOptFlds().isDataSetName()) {
       accessResult = new AccessResult();
-      accessResult.setSuccess(getDatSet().getMmsDataObj());
+      accessResult.setSuccess(getDataSetRef().getMmsDataObj());
       accessResults.add(accessResult);
     }
 

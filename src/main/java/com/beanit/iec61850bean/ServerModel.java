@@ -54,11 +54,11 @@ public final class ServerModel extends ModelNode {
       for (ModelNode ln : ld.getChildren()) {
         for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
           urcbs.put(urcb.getReference().toString(), urcb);
-          urcb.dataSet = getDataSet(urcb.getDatSet().getStringValue().replace('$', '.'));
+          urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
         for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
           brcbs.put(brcb.getReference().toString(), brcb);
-          brcb.dataSet = getDataSet(brcb.getDatSet().getStringValue().replace('$', '.'));
+          brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
       }
     }
@@ -98,10 +98,10 @@ public final class ServerModel extends ModelNode {
     for (ModelNode ld : children.values()) {
       for (ModelNode ln : ld.getChildren()) {
         for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
-          urcb.dataSet = getDataSet(urcb.getDatSet().getStringValue().replace('$', '.'));
+          urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
         for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
-          brcb.dataSet = getDataSet(brcb.getDatSet().getStringValue().replace('$', '.'));
+          brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
       }
     }
@@ -114,10 +114,10 @@ public final class ServerModel extends ModelNode {
     for (ModelNode ld : children.values()) {
       for (ModelNode ln : ld.getChildren()) {
         for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
-          urcb.dataSet = getDataSet(urcb.getDatSet().getStringValue().replace('$', '.'));
+          urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
         for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
-          brcb.dataSet = getDataSet(brcb.getDatSet().getStringValue().replace('$', '.'));
+          brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
       }
     }
@@ -158,10 +158,10 @@ public final class ServerModel extends ModelNode {
     for (ModelNode ld : children.values()) {
       for (ModelNode ln : ld.getChildren()) {
         for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
-          urcb.dataSet = getDataSet(urcb.getDatSet().getStringValue().replace('$', '.'));
+          urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
         for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
-          brcb.dataSet = getDataSet(brcb.getDatSet().getStringValue().replace('$', '.'));
+          brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
       }
     }

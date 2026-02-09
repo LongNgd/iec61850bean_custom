@@ -305,8 +305,8 @@ public class ClientServerITest extends Thread implements ServerEventListener, Cl
     assertEquals("urcb1", urcb1.getRptId().getStringValue());
     assertEquals("ied1lDevice1/LLN0.urcb2", urcb2.getRptId().getStringValue());
 
-    assertEquals("ied1lDevice1/LLN0$dataset1", urcb1.getDatSet().getStringValue());
-    assertEquals("ied1lDevice1/LLN0$dataset1", urcb2.getDatSet().getStringValue());
+    assertEquals("ied1lDevice1/LLN0$dataset1", urcb1.getDataSetRef().getStringValue());
+    assertEquals("ied1lDevice1/LLN0$dataset1", urcb2.getDataSetRef().getStringValue());
 
     assertEquals(true, urcb1.getOptFlds().isDataSetName());
     assertEquals(false, urcb1.getOptFlds().isBufferOverflow());

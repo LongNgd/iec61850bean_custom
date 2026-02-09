@@ -221,7 +221,7 @@ public class SclParser {
             for (ModelNode modelNode : logicalNode.getChildren()) {
               if (modelNode instanceof Rcb) {
                 Rcb rcb = (Rcb) modelNode;
-                String dataSetReference = rcb.getDatSet().getStringValue();
+                String dataSetReference = rcb.getDataSetRef().getStringValue();
                 if (dataSetReference != null) {
                   dataSetReference = dataSetReference.replace('$', '.');
                   DataSet dataSet = dataSetsMap.get(dataSetReference);

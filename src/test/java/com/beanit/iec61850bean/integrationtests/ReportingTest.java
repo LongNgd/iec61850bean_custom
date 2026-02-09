@@ -134,13 +134,13 @@ public class ReportingTest implements ClientEventListener {
 
     this.clientAssociation.getRcbValues(urcb);
 
-    assertEquals(PREEXISTING_DATASET_REFERENCE, urcb.getDatSet().getStringValue());
+    assertEquals(PREEXISTING_DATASET_REFERENCE, urcb.getDataSetRef().getStringValue());
 
-    System.out.println("dataset: " + urcb.getDatSet().getStringValue());
+    System.out.println("dataset: " + urcb.getDataSetRef().getStringValue());
 
     this.clientAssociation.reserveUrcb(urcb);
 
-    urcb.getDatSet().setValue(CREATED_DATASET_REFERENCE);
+    urcb.getDataSetRef().setValue(CREATED_DATASET_REFERENCE);
     List<ServiceError> serviceErrors =
         this.clientAssociation.setRcbValues(
             urcb, false, true, false, false, false, false, false, false);
@@ -149,7 +149,7 @@ public class ReportingTest implements ClientEventListener {
 
     this.clientAssociation.getRcbValues(urcb);
 
-    assertEquals(CREATED_DATASET_REFERENCE, urcb.getDatSet().getStringValue());
+    assertEquals(CREATED_DATASET_REFERENCE, urcb.getDataSetRef().getStringValue());
 
     this.clientAssociation.enableReporting(urcb);
 

@@ -50,7 +50,7 @@ public abstract class Rcb extends FcDataObject {
    *
    * @return the object reference of the DataSet
    */
-  public BdaVisibleString getDatSet() {
+  public BdaVisibleString getDataSetRef() {
     return (BdaVisibleString) children.get("DatSet");
   }
 

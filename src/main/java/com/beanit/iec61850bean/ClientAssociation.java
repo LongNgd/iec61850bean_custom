@@ -1635,8 +1635,8 @@ public final class ClientAssociation {
       parametersToSet.add(rcb.getRptId());
     }
     if (setDatSet == true) {
-      rcb.getDatSet().setValue(rcb.getDatSet().getStringValue().replace('.', '$'));
-      parametersToSet.add(rcb.getDatSet());
+      rcb.getDataSetRef().setValue(rcb.getDataSetRef().getStringValue().replace('.', '$'));
+      parametersToSet.add(rcb.getDataSetRef());
     }
     if (setOptFlds == true) {
       parametersToSet.add(rcb.getOptFlds());
@@ -1738,7 +1738,7 @@ public final class ClientAssociation {
       for (Urcb urcb : serverModel.getUrcbs()) {
         if ((urcb.getRptId() != null && urcb.getRptId().getStringValue().equals(rptId))
             || urcb.getReference().toString().equals(rptId)) {
-          dataSetRef = urcb.getDatSet().getStringValue();
+          dataSetRef = urcb.getDataSetRef().getStringValue();
           break;
         }
       }
@@ -1746,7 +1746,7 @@ public final class ClientAssociation {
         for (Brcb brcb : serverModel.getBrcbs()) {
           if ((brcb.getRptId() != null && brcb.getRptId().getStringValue().equals(rptId))
               || brcb.getReference().toString().equals(rptId)) {
-            dataSetRef = brcb.getDatSet().getStringValue();
+            dataSetRef = brcb.getDataSetRef().getStringValue();
             break;
           }
         }
