@@ -24,8 +24,10 @@ public abstract class Rcb extends FcDataObject {
   }
 
   /**
-   * Gets the RptID (Report ID). The RptID will be included in every report sent by the server. If
-   * it is equal to NULL, then the RptID sent will be equal to the reference of the RCB.
+   * Gets the RptID (Report ID). The RptID will be included in every report sent
+   * by the server. If
+   * it is equal to NULL, then the RptID sent will be equal to the reference of
+   * the RCB.
    *
    * @return the report ID
    */
@@ -43,7 +45,8 @@ public abstract class Rcb extends FcDataObject {
   }
 
   /**
-   * Gets the object reference of the DataSet that is to be monitored for reporting events.
+   * Gets the object reference of the DataSet that is to be monitored for
+   * reporting events.
    *
    * @return the object reference of the DataSet
    */
@@ -51,21 +54,31 @@ public abstract class Rcb extends FcDataObject {
     return (BdaVisibleString) children.get("DatSet");
   }
 
+  public DataSet getDataSet() {
+    return dataSet;
+  }
+
   /**
-   * Configuration revision The attribute ConfRev shall represent a count of the number of times
-   * that the configuration of the DATA-SET referenced by DatSet has been changed. Changes that
+   * Configuration revision The attribute ConfRev shall represent a count of the
+   * number of times
+   * that the configuration of the DATA-SET referenced by DatSet has been changed.
+   * Changes that
    * shall be counted are:
    *
    * <ul>
-   *   <li>any deletion of a member of the DATA-SET;
-   *   <li>the reordering of members of the DATA-SET; and
-   *   <li>Successful SetBRCBValues of the DatSet attribute where the DatSet attribute value
-   *       changes.
+   * <li>any deletion of a member of the DATA-SET;
+   * <li>the reordering of members of the DATA-SET; and
+   * <li>Successful SetBRCBValues of the DatSet attribute where the DatSet
+   * attribute value
+   * changes.
    * </ul>
    *
-   * The counter shall be incremented when the configuration changes. At configuration time, the
-   * configuration tool will be responsible for incrementing/maintaining the ConfRev value. When
-   * configuration changes occur due to SetBRCBValues, the IED shall be responsible for incrementing
+   * The counter shall be incremented when the configuration changes. At
+   * configuration time, the
+   * configuration tool will be responsible for incrementing/maintaining the
+   * ConfRev value. When
+   * configuration changes occur due to SetBRCBValues, the IED shall be
+   * responsible for incrementing
    * the value of ConfRev.
    *
    * @return the configuration revision
@@ -75,7 +88,8 @@ public abstract class Rcb extends FcDataObject {
   }
 
   /**
-   * Gets the optional fields parameter which specifies which optional fields should be included in
+   * Gets the optional fields parameter which specifies which optional fields
+   * should be included in
    * the reports sent by this RCB.
    *
    * @return the optional fields parameter
@@ -85,9 +99,12 @@ public abstract class Rcb extends FcDataObject {
   }
 
   /**
-   * Gets the buffer time - The attribute BufTm (see Figure 27) shall specify the time interval in
-   * milliseconds for the buffering of internal notifications caused by data-change (dchg),
-   * quality-change (qchg), data update (dupd) by the BRCB for inclusion into a single report.
+   * Gets the buffer time - The attribute BufTm (see Figure 27) shall specify the
+   * time interval in
+   * milliseconds for the buffering of internal notifications caused by
+   * data-change (dchg),
+   * quality-change (qchg), data update (dupd) by the BRCB for inclusion into a
+   * single report.
    *
    * @return the buffer time
    */
@@ -96,9 +113,12 @@ public abstract class Rcb extends FcDataObject {
   }
 
   /**
-   * Gets the sequence number - The attribute SqNum shall specify the sequence number for each BRCB
-   * that has report enable set to TRUE. This number is to be incremented by the BRCB for each
-   * report generated and sent. The increment shall occur once the BRCB has formatted the report and
+   * Gets the sequence number - The attribute SqNum shall specify the sequence
+   * number for each BRCB
+   * that has report enable set to TRUE. This number is to be incremented by the
+   * BRCB for each
+   * report generated and sent. The increment shall occur once the BRCB has
+   * formatted the report and
    * requested for transmission.
    *
    * @return the sequence number

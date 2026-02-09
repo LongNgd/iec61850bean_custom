@@ -212,6 +212,28 @@ public class SclParser {
 
     serverModel.addDataSets(dataSetsMap.values());
 
+    for (ModelNode ldNode : serverModel.getChildren()) {
+      if (ldNode instanceof LogicalDevice) {
+        LogicalDevice logicalDevice = (LogicalDevice) ldNode;
+        for (ModelNode lnNode : logicalDevice.getChildren()) {
+          if (lnNode instanceof LogicalNode) {
+            LogicalNode logicalNode = (LogicalNode) lnNode;
+            for (ModelNode modelNode : logicalNode.getChildren()) {
+              if (modelNode instanceof Rcb) {
+                Rcb rcb = (Rcb) modelNode;
+                String dataSetReference = rcb.getDatSet().getStringValue();
+                if (dataSetReference != null) {
+                  dataSetReference = dataSetReference.replace('$', '.');
+                  DataSet dataSet = dataSetsMap.get(dataSetReference);
+                  rcb.dataSet = dataSet;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     dataSetDefs.clear();
 
     // Add GOOSE control blocks to the server model
@@ -512,12 +534,12 @@ public class SclParser {
       if ("RptEnabled".equals(childNode.getNodeName())) {
         Node rptEnabledMaxAttr = childNode.getAttributes().getNamedItem("max");
         if (rptEnabledMaxAttr != null) {
-          maxInstances = Integer.parseInt(rptEnabledMaxAttr.getNodeValue());
-          if (maxInstances < 1 || maxInstances > 99) {
-            throw new SclParseException(
-                "Report Control Block max instances should be between 1 and 99 but is: "
-                    + maxInstances);
-          }
+          // maxInstances = Integer.parseInt(rptEnabledMaxAttr.getNodeValue());
+          // if (maxInstances < 1 || maxInstances > 99) {
+          // throw new SclParseException(
+          // "Report Control Block max instances should be between 1 and 99 but is: "
+          // + maxInstances);
+          // }
         }
       }
     }
@@ -607,12 +629,12 @@ public class SclParser {
         } else if ("RptEnabled".equals(childNode.getNodeName())) {
           Node rptEnabledMaxAttr = childNode.getAttributes().getNamedItem("max");
           if (rptEnabledMaxAttr != null) {
-            maxInstances = Integer.parseInt(rptEnabledMaxAttr.getNodeValue());
-            if (maxInstances < 1 || maxInstances > 99) {
-              throw new SclParseException(
-                  "Report Control Block max instances should be between 1 and 99 but is: "
-                      + maxInstances);
-            }
+            // maxInstances = Integer.parseInt(rptEnabledMaxAttr.getNodeValue());
+            // if (maxInstances < 1 || maxInstances > 99) {
+            // throw new SclParseException(
+            // "Report Control Block max instances should be between 1 and 99 but is: "
+            // + maxInstances);
+            // }
           }
         }
       }
