@@ -158,7 +158,7 @@ public final class ServerModel extends ModelNode {
 
   private void updateGooseDataSets() {
     for (Goose goose : gooses.values()) {
-      String dataSetReference = goose.getDataSetReference();
+      String dataSetReference = goose.getControlBlock().getDataSetReference();
       if (dataSetReference != null) {
         goose.setDataSet(getDataSet(dataSetReference.replace('$', '.')));
       } else {
@@ -214,7 +214,7 @@ public final class ServerModel extends ModelNode {
   }
 
   void addGoose(Goose goose) {
-    String dataSetReference = goose.getDataSetReference();
+    String dataSetReference = goose.getControlBlock().getDataSetReference();
     if (dataSetReference != null) {
       goose.setDataSet(getDataSet(dataSetReference.replace('$', '.')));
     }

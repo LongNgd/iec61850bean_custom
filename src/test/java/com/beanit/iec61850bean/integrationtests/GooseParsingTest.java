@@ -1,6 +1,7 @@
 package com.beanit.iec61850bean.integrationtests;
 
 import com.beanit.iec61850bean.Goose;
+import com.beanit.iec61850bean.GooseControlBlock;
 import com.beanit.iec61850bean.SclParseException;
 import com.beanit.iec61850bean.SclParser;
 import com.beanit.iec61850bean.ServerModel;
@@ -29,19 +30,20 @@ public class GooseParsingTest {
         System.out.println("Found " + gooseBlocks.size() + " GOOSE control blocks\n");
 
         for (Goose gcb : gooseBlocks) {
+            GooseControlBlock controlBlock = gcb.getControlBlock();
             System.out.println("GOOSE Control Block:");
-            System.out.println("  Reference: " + gcb.getControlBlockReference());
-            System.out.println("  Application ID: " + gcb.getApplicationId());
-            System.out.println("  GOOSE ID: " + gcb.getGooseId());
-            System.out.println("  Dataset: " + gcb.getDataSetReference());
+            System.out.println("  Reference: " + controlBlock.getControlBlockReference());
+            System.out.println("  Application ID: " + controlBlock.getApplicationId());
+            System.out.println("  GOOSE ID: " + controlBlock.getGooseId());
+            System.out.println("  Dataset: " + controlBlock.getDataSetReference());
             System.out.println(
                 "  Dataset object: "
                     + (gcb.getDataSet() != null ? gcb.getDataSet().getReferenceStr() : null));
-            System.out.println("  MAC Address: " + gcb.getDestinationMacAddress());
-            System.out.println("  VLAN ID: " + gcb.getVlanId());
-            System.out.println("  VLAN Priority: " + gcb.getVlanPriority());
-            System.out.println("  Config Revision: " + gcb.getConfigurationRevision());
-            System.out.println("  Enabled: " + gcb.isEnabled());
+            System.out.println("  MAC Address: " + controlBlock.getDestinationMacAddress());
+            System.out.println("  VLAN ID: " + controlBlock.getVlanId());
+            System.out.println("  VLAN Priority: " + controlBlock.getVlanPriority());
+            System.out.println("  Config Revision: " + controlBlock.getConfigurationRevision());
+            System.out.println("  Enabled: " + controlBlock.isEnabled());
             System.out.println();
         }
 
@@ -52,15 +54,16 @@ public class GooseParsingTest {
         // Verify one of the GOOSE blocks
         boolean foundGcb01 = false;
         for (Goose gcb : gooseBlocks) {
-            if (gcb.getControlBlockReference().contains("gcb01")) {
+            GooseControlBlock controlBlock = gcb.getControlBlock();
+            if (controlBlock.getControlBlockReference().contains("gcb01")) {
                 foundGcb01 = true;
-                assertEquals("F650_GOOSE1", gcb.getApplicationId());
-                assertNotNull(gcb.getDataSetReference());
-                assertTrue(gcb.getDataSetReference().contains("GOOSE1"));
+                assertEquals("F650_GOOSE1", controlBlock.getApplicationId());
+                assertNotNull(controlBlock.getDataSetReference());
+                assertTrue(controlBlock.getDataSetReference().contains("GOOSE1"));
                 assertNotNull(gcb.getDataSet());
                 assertEquals(
-                    gcb.getDataSetReference().replace('$', '.'), gcb.getDataSet().getReferenceStr());
-                assertEquals("1", gcb.getConfigurationRevision());
+                    controlBlock.getDataSetReference().replace('$', '.'), gcb.getDataSet().getReferenceStr());
+                assertEquals("1", controlBlock.getConfigurationRevision());
             }
         }
         assertTrue(foundGcb01, "Should find gcb01 GOOSE control block");
@@ -79,10 +82,11 @@ public class GooseParsingTest {
         System.out.println("Found " + gooseBlocks.size() + " GOOSE control blocks\n");
 
         for (Goose gcb : gooseBlocks) {
+            GooseControlBlock controlBlock = gcb.getControlBlock();
             System.out.println("GOOSE Control Block:");
-            System.out.println("  Reference: " + gcb.getControlBlockReference());
-            System.out.println("  Application ID: " + gcb.getApplicationId());
-            System.out.println("  Dataset: " + gcb.getDataSetReference());
+            System.out.println("  Reference: " + controlBlock.getControlBlockReference());
+            System.out.println("  Application ID: " + controlBlock.getApplicationId());
+            System.out.println("  Dataset: " + controlBlock.getDataSetReference());
             System.out.println();
         }
 
@@ -97,23 +101,24 @@ public class GooseParsingTest {
         Collection<Goose> gooseBlocks = model.getGooses();
 
         for (Goose gcb : gooseBlocks) {
+            GooseControlBlock controlBlock = gcb.getControlBlock();
             // Verify basic properties are set
             assertNotNull(gcb.getReference(), "Reference should not be null");
-            assertNotNull(gcb.getControlBlockReference(), "Control block reference should not be null");
+            assertNotNull(controlBlock.getControlBlockReference(), "Control block reference should not be null");
 
-            if (gcb.getDataSetReference() != null) {
+            if (controlBlock.getDataSetReference() != null) {
                 assertNotNull(gcb.getDataSet(), "Dataset object should be linked when datSet is present");
                 assertEquals(
-                    gcb.getDataSetReference().replace('$', '.'), gcb.getDataSet().getReferenceStr());
+                    controlBlock.getDataSetReference().replace('$', '.'), gcb.getDataSet().getReferenceStr());
             }
 
             // Application ID should be set for valid GOOSE blocks
-            if (gcb.getControlBlockReference().contains("gcb01")) {
-                assertNotNull(gcb.getApplicationId(), "Application ID should not be null");
+            if (controlBlock.getControlBlockReference().contains("gcb01")) {
+                assertNotNull(controlBlock.getApplicationId(), "Application ID should not be null");
             }
 
             // Enabled should default to true
-            assertTrue(gcb.isEnabled(), "GOOSE should be enabled by default");
+            assertTrue(controlBlock.isEnabled(), "GOOSE should be enabled by default");
         }
     }
 
@@ -129,7 +134,9 @@ public class GooseParsingTest {
             String reference = gcb.getReference().toString();
             Goose retrieved = model.getGoose(reference);
             assertNotNull(retrieved, "Should be able to retrieve GOOSE block by reference");
-            assertEquals(gcb.getControlBlockReference(), retrieved.getControlBlockReference());
+            assertEquals(
+                gcb.getControlBlock().getControlBlockReference(),
+                retrieved.getControlBlock().getControlBlockReference());
         }
     }
 }

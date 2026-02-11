@@ -864,20 +864,20 @@ public class SclParser {
 
     // Create the Goose
     ObjectReference objectReference = new ObjectReference(controlBlockReference.replace("$", "."));
+    GooseControlBlock gooseControlBlock =
+        new GooseControlBlock(
+            enabled,
+            controlBlockReference,
+            destinationMacAddress,
+            applicationId,
+            gooseId,
+            dataSetReference,
+            vlanId,
+            vlanPriority,
+            needCommissioning,
+            configurationRevision);
 
-    return new Goose(
-        objectReference,
-        enabled,
-        controlBlockReference,
-        destinationMacAddress,
-        applicationId,
-        gooseId,
-        dataSetReference,
-        null,
-        vlanId,
-        vlanPriority,
-        needCommissioning,
-        configurationRevision);
+    return new Goose(objectReference, gooseControlBlock, null);
   }
 
   private SettingGroup createSettingGroup(Node settingControlNode, String parentRef) {
