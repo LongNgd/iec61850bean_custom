@@ -34,6 +34,9 @@ public class GooseParsingTest {
             System.out.println("  Application ID: " + gcb.getApplicationId());
             System.out.println("  GOOSE ID: " + gcb.getGooseId());
             System.out.println("  Dataset: " + gcb.getDataSetReference());
+            System.out.println(
+                "  Dataset object: "
+                    + (gcb.getDataSet() != null ? gcb.getDataSet().getReferenceStr() : null));
             System.out.println("  MAC Address: " + gcb.getDestinationMacAddress());
             System.out.println("  VLAN ID: " + gcb.getVlanId());
             System.out.println("  VLAN Priority: " + gcb.getVlanPriority());
@@ -54,6 +57,9 @@ public class GooseParsingTest {
                 assertEquals("F650_GOOSE1", gcb.getApplicationId());
                 assertNotNull(gcb.getDataSetReference());
                 assertTrue(gcb.getDataSetReference().contains("GOOSE1"));
+                assertNotNull(gcb.getDataSet());
+                assertEquals(
+                    gcb.getDataSetReference().replace('$', '.'), gcb.getDataSet().getReferenceStr());
                 assertEquals("1", gcb.getConfigurationRevision());
             }
         }
@@ -94,6 +100,12 @@ public class GooseParsingTest {
             // Verify basic properties are set
             assertNotNull(gcb.getReference(), "Reference should not be null");
             assertNotNull(gcb.getControlBlockReference(), "Control block reference should not be null");
+
+            if (gcb.getDataSetReference() != null) {
+                assertNotNull(gcb.getDataSet(), "Dataset object should be linked when datSet is present");
+                assertEquals(
+                    gcb.getDataSetReference().replace('$', '.'), gcb.getDataSet().getReferenceStr());
+            }
 
             // Application ID should be set for valid GOOSE blocks
             if (gcb.getControlBlockReference().contains("gcb01")) {

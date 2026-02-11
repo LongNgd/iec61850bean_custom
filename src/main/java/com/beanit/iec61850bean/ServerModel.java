@@ -95,32 +95,14 @@ public final class ServerModel extends ModelNode {
 
   void addDataSet(DataSet dataSet) {
     dataSets.put(dataSet.getReferenceStr().replace('$', '.'), dataSet);
-    for (ModelNode ld : children.values()) {
-      for (ModelNode ln : ld.getChildren()) {
-        for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
-          urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
-        }
-        for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
-          brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
-        }
-      }
-    }
+    updateControlBlockDataSets();
   }
 
   void addDataSets(Collection<DataSet> dataSets) {
     for (DataSet dataSet : dataSets) {
       addDataSet(dataSet);
     }
-    for (ModelNode ld : children.values()) {
-      for (ModelNode ln : ld.getChildren()) {
-        for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
-          urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
-        }
-        for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
-          brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
-        }
-      }
-    }
+    updateControlBlockDataSets();
   }
 
   List<String> getDataSetNames(String ldName) {
@@ -155,17 +137,34 @@ public final class ServerModel extends ModelNode {
       return null;
     }
     DataSet removedDataSet = dataSets.remove(dataSetReference);
+    updateControlBlockDataSets();
+    return removedDataSet;
+  }
+
+  private void updateControlBlockDataSets() {
     for (ModelNode ld : children.values()) {
       for (ModelNode ln : ld.getChildren()) {
-        for (Urcb urcb : ((LogicalNode) ln).getUrcbs()) {
+        LogicalNode logicalNode = (LogicalNode) ln;
+        for (Urcb urcb : logicalNode.getUrcbs()) {
           urcb.dataSet = getDataSet(urcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
-        for (Brcb brcb : ((LogicalNode) ln).getBrcbs()) {
+        for (Brcb brcb : logicalNode.getBrcbs()) {
           brcb.dataSet = getDataSet(brcb.getDataSetRef().getStringValue().replace('$', '.'));
         }
       }
     }
-    return removedDataSet;
+    updateGooseDataSets();
+  }
+
+  private void updateGooseDataSets() {
+    for (Goose goose : gooses.values()) {
+      String dataSetReference = goose.getDataSetReference();
+      if (dataSetReference != null) {
+        goose.setDataSet(getDataSet(dataSetReference.replace('$', '.')));
+      } else {
+        goose.setDataSet(null);
+      }
+    }
   }
 
   void addUrcb(Urcb urcb) {
@@ -215,6 +214,10 @@ public final class ServerModel extends ModelNode {
   }
 
   void addGoose(Goose goose) {
+    String dataSetReference = goose.getDataSetReference();
+    if (dataSetReference != null) {
+      goose.setDataSet(getDataSet(dataSetReference.replace('$', '.')));
+    }
     gooses.put(goose.getReference().toString(), goose);
   }
 

@@ -873,6 +873,7 @@ public class SclParser {
         applicationId,
         gooseId,
         dataSetReference,
+        null,
         vlanId,
         vlanPriority,
         needCommissioning,
