@@ -92,6 +92,24 @@ public class GooseParsingTest {
 
         // B431_F87T.cid should have multiple GOOSE control blocks
         assertFalse(gooseBlocks.isEmpty(), "Should have GOOSE blocks");
+
+        for (Goose goose : gooseBlocks) {
+            GooseControlBlock controlBlock = goose.getControlBlock();
+            String reference = controlBlock.getControlBlockReference();
+            if (reference.contains("GSE_487E_02")) {
+                assertEquals("48", controlBlock.getApplicationId());
+                assertEquals("487E_GSE02", controlBlock.getGooseId());
+                assertEquals("1", controlBlock.getVlanId());
+            } else if (reference.contains("GSE_487E_03")) {
+                assertEquals("49", controlBlock.getApplicationId());
+                assertEquals("487E_GSE03", controlBlock.getGooseId());
+                assertEquals("1", controlBlock.getVlanId());
+            } else if (reference.contains("GSE_487E_04")) {
+                assertEquals("50", controlBlock.getApplicationId());
+                assertEquals("GSE_487E_04", controlBlock.getGooseId());
+                assertEquals("1", controlBlock.getVlanId());
+            }
+        }
     }
 
     @Test

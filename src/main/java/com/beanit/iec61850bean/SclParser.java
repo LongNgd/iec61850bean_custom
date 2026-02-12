@@ -846,12 +846,11 @@ public class SclParser {
       dataSetReference = parentRef + "$" + datSetAttr.getNodeValue();
     }
 
-    // Get applicationId/gooseId attribute
+    // Get gooseId attribute (vendor-specific naming often stored in appID)
     String gooseId = null;
     String applicationId = null;
     Node gooseIdAttr = attributes.getNamedItem("appID");
     if (gooseIdAttr != null) {
-      applicationId = gooseIdAttr.getNodeValue();
       gooseId = gooseIdAttr.getNodeValue();
     }
 
@@ -896,16 +895,14 @@ public class SclParser {
                   if ("MAC-Address".equals(pType)) {
                     destinationMacAddress = pValue.replace("-", ":");
                   } else if ("APPID".equals(pType)) {
-                    if (applicationId == null) {
-                      applicationId = pValue;
-                    }
+                    applicationId = parseHexOrDecimalString(pValue);
                     if (gooseId == null) {
                       gooseId = pValue;
                     }
                   } else if ("VLAN-ID".equals(pType)) {
-                    vlanId = pValue;
+                    vlanId = parseDecimalString(pValue);
                   } else if ("VLAN-PRIORITY".equals(pType)) {
-                    vlanPriority = pValue;
+                    vlanPriority = parseDecimalString(pValue);
                   }
                 }
               }
@@ -920,6 +917,10 @@ public class SclParser {
 
     // needCommissioning attribute (optional)
     String needCommissioning = null;
+
+    if (applicationId == null) {
+      applicationId = gooseId;
+    }
 
     // Create the Goose
     ObjectReference objectReference = new ObjectReference(controlBlockReference.replace("$", "."));
@@ -937,6 +938,30 @@ public class SclParser {
             configurationRevision);
 
     return new Goose(objectReference, gooseControlBlock, null);
+  }
+
+  private String parseHexOrDecimalString(String value) {
+    String trimmedValue = value.trim();
+    if (trimmedValue.matches("[0-9a-fA-F]+")) {
+      try {
+        return Integer.toString(Integer.parseInt(trimmedValue, 16));
+      } catch (NumberFormatException e) {
+        return trimmedValue;
+      }
+    }
+    return parseDecimalString(trimmedValue);
+  }
+
+  private String parseDecimalString(String value) {
+    String trimmedValue = value.trim();
+    if (trimmedValue.matches("[0-9]+")) {
+      try {
+        return Integer.toString(Integer.parseInt(trimmedValue));
+      } catch (NumberFormatException e) {
+        return trimmedValue;
+      }
+    }
+    return trimmedValue;
   }
 
   private String buildTriggerOptions(
