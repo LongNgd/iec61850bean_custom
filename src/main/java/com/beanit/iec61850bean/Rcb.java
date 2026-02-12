@@ -17,10 +17,20 @@ import java.util.List;
 
 public abstract class Rcb extends FcDataObject {
 
+  ReportControlBlock controlBlock;
   DataSet dataSet;
 
-  protected Rcb(ObjectReference objectReference, Fc fc, List<FcModelNode> children) {
+  protected Rcb(
+      ObjectReference objectReference,
+      Fc fc,
+      List<FcModelNode> children,
+      ReportControlBlock controlBlock) {
     super(objectReference, fc, children);
+    this.controlBlock = controlBlock;
+  }
+
+  public ReportControlBlock getControlBlock() {
+    return controlBlock;
   }
 
   /**

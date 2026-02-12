@@ -108,9 +108,9 @@ final class DataDefinitionResParser {
               fc,
               doComp.getComponentType().getTypeDescription().getStructure().getComponents());
       if (fc == Fc.RP) {
-        dataObjects.add(new Urcb(doRef, children));
+        dataObjects.add(new Urcb(doRef, children, null));
       } else if (fc == Fc.BR) {
-        dataObjects.add(new Brcb(doRef, children));
+        dataObjects.add(new Brcb(doRef, children, null));
       } else {
         dataObjects.add(new FcDataObject(doRef, fc, children));
       }

@@ -18,8 +18,9 @@ import java.util.List;
 
 public class Brcb extends Rcb {
 
-  public Brcb(ObjectReference objectReference, List<FcModelNode> children) {
-    super(objectReference, Fc.BR, children);
+  public Brcb(
+      ObjectReference objectReference, List<FcModelNode> children, ReportControlBlock controlBlock) {
+    super(objectReference, Fc.BR, children, controlBlock);
   }
 
   public BdaBoolean getPurgeBuf() {
@@ -50,7 +51,7 @@ public class Brcb extends Rcb {
     for (ModelNode childNode : children.values()) {
       childCopies.add((FcModelNode) childNode.copy());
     }
-    Brcb brcb = new Brcb(objectReference, childCopies);
+    Brcb brcb = new Brcb(objectReference, childCopies, controlBlock);
     brcb.dataSet = dataSet;
     return brcb;
   }

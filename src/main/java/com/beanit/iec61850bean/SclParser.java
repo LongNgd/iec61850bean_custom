@@ -549,17 +549,23 @@ public class SclParser {
     for (int z = 1; z <= maxInstances; z++) {
 
       ObjectReference reportObjRef;
+      String reportName;
 
       if (maxInstances == 1) {
-
-        reportObjRef = new ObjectReference(parentRef + "." + nameAttribute.getNodeValue());
+        reportName = nameAttribute.getNodeValue();
+        reportObjRef = new ObjectReference(parentRef + "." + reportName);
       } else {
-        reportObjRef = new ObjectReference(
-            parentRef + "." + nameAttribute.getNodeValue() + String.format("%02d", z));
+        reportName = nameAttribute.getNodeValue() + String.format("%02d", z);
+        reportObjRef = new ObjectReference(parentRef + "." + reportName);
       }
 
       BdaTriggerConditions trigOps = new BdaTriggerConditions(new ObjectReference(reportObjRef + ".TrgOps"), fc);
       BdaOptFlds optFields = new BdaOptFlds(new ObjectReference(reportObjRef + ".OptFlds"), fc);
+      boolean dataChange = false;
+      boolean qualityChange = false;
+      boolean dataUpdate = false;
+      boolean integrity = false;
+      boolean generalInterrogation = false;
       for (int i = 0; i < xmlNode.getChildNodes().getLength(); i++) {
         Node childNode = xmlNode.getChildNodes().item(i);
         if (childNode.getNodeName().equals("TrgOps")) {
@@ -572,18 +578,23 @@ public class SclParser {
               String nodeName = node.getNodeName();
 
               if ("dchg".equals(nodeName)) {
-                trigOps.setDataChange(node.getNodeValue().equalsIgnoreCase("true"));
+                dataChange = node.getNodeValue().equalsIgnoreCase("true");
+                trigOps.setDataChange(dataChange);
               } else if ("qchg".equals(nodeName)) {
-                trigOps.setQualityChange(node.getNodeValue().equalsIgnoreCase("true"));
+                qualityChange = node.getNodeValue().equalsIgnoreCase("true");
+                trigOps.setQualityChange(qualityChange);
 
               } else if ("dupd".equals(nodeName)) {
-                trigOps.setDataUpdate(node.getNodeValue().equalsIgnoreCase("true"));
+                dataUpdate = node.getNodeValue().equalsIgnoreCase("true");
+                trigOps.setDataUpdate(dataUpdate);
 
               } else if ("period".equals(nodeName)) {
-                trigOps.setIntegrity(node.getNodeValue().equalsIgnoreCase("true"));
+                integrity = node.getNodeValue().equalsIgnoreCase("true");
+                trigOps.setIntegrity(integrity);
 
               } else if ("gi".equals(nodeName)) {
-                trigOps.setGeneralInterrogation(node.getNodeValue().equalsIgnoreCase("true"));
+                generalInterrogation = node.getNodeValue().equalsIgnoreCase("true");
+                trigOps.setGeneralInterrogation(generalInterrogation);
               }
             }
           }
@@ -648,11 +659,14 @@ public class SclParser {
 
       BdaVisibleString rptId = new BdaVisibleString(
           new ObjectReference(reportObjRef.toString() + ".RptID"), fc, "", 129, false, false);
+      String reportId;
       attribute = rcbNodeAttributes.getNamedItem("rptID");
       if (attribute != null) {
-        rptId.setValue(attribute.getNodeValue().getBytes(UTF_8));
+        reportId = attribute.getNodeValue();
+        rptId.setValue(reportId.getBytes(UTF_8));
       } else {
-        rptId.setValue(reportObjRef.toString());
+        reportId = reportObjRef.toString();
+        rptId.setValue(reportId);
       }
 
       children.add(rptId);
@@ -670,11 +684,12 @@ public class SclParser {
       BdaVisibleString datSet = new BdaVisibleString(
           new ObjectReference(reportObjRef.toString() + ".DatSet"), fc, "", 129, false, false);
 
+      String dataSetReference = null;
       attribute = xmlNode.getAttributes().getNamedItem("datSet");
       if (attribute != null) {
         String nodeValue = attribute.getNodeValue();
-        String dataSetName = parentRef + "$" + nodeValue;
-        datSet.setValue(dataSetName.getBytes(UTF_8));
+        dataSetReference = parentRef + "$" + nodeValue;
+        datSet.setValue(dataSetReference.getBytes(UTF_8));
       }
       children.add(datSet);
 
@@ -685,7 +700,8 @@ public class SclParser {
         throw new SclParseException(
             "Report Control Block does not contain mandatory attribute confRev");
       }
-      confRef.setValue(Long.parseLong(attribute.getNodeValue()));
+      long configurationRevision = Long.parseLong(attribute.getNodeValue());
+      confRef.setValue(configurationRevision);
       children.add(confRef);
 
       children.add(optFields);
@@ -693,8 +709,10 @@ public class SclParser {
       BdaInt32U bufTm = new BdaInt32U(
           new ObjectReference(reportObjRef.toString() + ".BufTm"), fc, "", false, false);
       attribute = xmlNode.getAttributes().getNamedItem("bufTime");
+      long bufferTimeMs = 0;
       if (attribute != null) {
-        bufTm.setValue(Long.parseLong(attribute.getNodeValue()));
+        bufferTimeMs = Long.parseLong(attribute.getNodeValue());
+        bufTm.setValue(bufferTimeMs);
       }
       children.add(bufTm);
 
@@ -707,8 +725,10 @@ public class SclParser {
       BdaInt32U intgPd = new BdaInt32U(
           new ObjectReference(reportObjRef.toString() + ".IntgPd"), fc, "", false, false);
       attribute = xmlNode.getAttributes().getNamedItem("intgPd");
+      long integrityPeriodMs = 0;
       if (attribute != null) {
-        intgPd.setValue(Long.parseLong(attribute.getNodeValue()));
+        integrityPeriodMs = Long.parseLong(attribute.getNodeValue());
+        intgPd.setValue(integrityPeriodMs);
       }
       children.add(intgPd);
 
@@ -717,6 +737,7 @@ public class SclParser {
               new ObjectReference(reportObjRef.toString() + ".GI"), fc, "", false, false));
 
       Rcb rcb = null;
+      String owner = "";
 
       if (fc == Fc.BR) {
 
@@ -751,14 +772,40 @@ public class SclParser {
             new BdaOctetString(
                 new ObjectReference(reportObjRef.toString() + ".Owner"), fc, "", 64, false, false));
 
-        rcb = new Brcb(reportObjRef, children);
+        ReportControlBlock controlBlock =
+            new ReportControlBlock(
+                false,
+                false,
+                parentRef + "$" + fc.name() + "$" + reportName,
+                reportId,
+                dataSetReference,
+                buildTriggerOptions(
+                    dataChange, qualityChange, dataUpdate, integrity, generalInterrogation),
+                bufferTimeMs,
+                configurationRevision,
+                integrityPeriodMs,
+                owner);
+        rcb = new Brcb(reportObjRef, children, controlBlock);
 
       } else {
         children.add(
             new BdaOctetString(
                 new ObjectReference(reportObjRef.toString() + ".Owner"), fc, "", 64, false, false));
 
-        rcb = new Urcb(reportObjRef, children);
+        ReportControlBlock controlBlock =
+            new ReportControlBlock(
+                false,
+                false,
+                parentRef + "$" + fc.name() + "$" + reportName,
+                reportId,
+                dataSetReference,
+                buildTriggerOptions(
+                    dataChange, qualityChange, dataUpdate, integrity, generalInterrogation),
+                bufferTimeMs,
+                configurationRevision,
+                integrityPeriodMs,
+                owner);
+        rcb = new Urcb(reportObjRef, children, controlBlock);
       }
 
       rcbInstances.add(rcb);
@@ -878,6 +925,38 @@ public class SclParser {
             configurationRevision);
 
     return new Goose(objectReference, gooseControlBlock, null);
+  }
+
+  private String buildTriggerOptions(
+      boolean dataChange,
+      boolean qualityChange,
+      boolean dataUpdate,
+      boolean integrity,
+      boolean generalInterrogation) {
+    StringBuilder options = new StringBuilder();
+    if (dataChange) {
+      options.append("DataChange");
+    }
+    if (qualityChange) {
+      appendTriggerOption(options, "QualityChange");
+    }
+    if (dataUpdate) {
+      appendTriggerOption(options, "DataUpdate");
+    }
+    if (integrity) {
+      appendTriggerOption(options, "Integrity");
+    }
+    if (generalInterrogation) {
+      appendTriggerOption(options, "GeneralInterrogation");
+    }
+    return options.toString();
+  }
+
+  private void appendTriggerOption(StringBuilder options, String option) {
+    if (options.length() > 0) {
+      options.append(", ");
+    }
+    options.append(option);
   }
 
   private SettingGroup createSettingGroup(Node settingControlNode, String parentRef) {

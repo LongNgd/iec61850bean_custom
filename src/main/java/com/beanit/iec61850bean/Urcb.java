@@ -43,8 +43,9 @@ public class Urcb extends Rcb {
   // private ScheduledFuture<?> integrityFuture = null;
   private ScheduledFuture<?> bufTmFuture = null;
 
-  public Urcb(ObjectReference objectReference, List<FcModelNode> children) {
-    super(objectReference, Fc.RP, children);
+  public Urcb(
+      ObjectReference objectReference, List<FcModelNode> children, ReportControlBlock controlBlock) {
+    super(objectReference, Fc.RP, children, controlBlock);
   }
 
   /**
@@ -319,7 +320,7 @@ public class Urcb extends Rcb {
     for (ModelNode childNode : children.values()) {
       childCopies.add((FcModelNode) childNode.copy());
     }
-    Urcb urcb = new Urcb(objectReference, childCopies);
+    Urcb urcb = new Urcb(objectReference, childCopies, controlBlock);
     urcb.dataSet = dataSet;
     return urcb;
   }
