@@ -1,12 +1,9 @@
 package com.beanit.iec61850bean;
 
-public final class ReportControlBlock {
+public final class ReportControlBlock extends ControlBlock {
 
-  private final boolean enabled;
   private final boolean reserved;
-  private final String controlBlockReference;
   private final String reportId;
-  private final String dataSetReference;
   private final String triggerOptions;
   private final long bufferTimeMs;
   private final long configurationRevision;
@@ -24,11 +21,9 @@ public final class ReportControlBlock {
       long configurationRevision,
       long integrityPeriodMs,
       String owner) {
-    this.enabled = enabled;
+    super(enabled, controlBlockReference, dataSetReference);
     this.reserved = reserved;
-    this.controlBlockReference = controlBlockReference;
     this.reportId = reportId;
-    this.dataSetReference = dataSetReference;
     this.triggerOptions = triggerOptions;
     this.bufferTimeMs = bufferTimeMs;
     this.configurationRevision = configurationRevision;
@@ -36,24 +31,12 @@ public final class ReportControlBlock {
     this.owner = owner;
   }
 
-  public boolean isEnabled() {
-    return enabled;
-  }
-
   public boolean isReserved() {
     return reserved;
   }
 
-  public String getControlBlockReference() {
-    return controlBlockReference;
-  }
-
   public String getReportId() {
     return reportId;
-  }
-
-  public String getDataSetReference() {
-    return dataSetReference;
   }
 
   public String getTriggerOptions() {

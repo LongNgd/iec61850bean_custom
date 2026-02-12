@@ -1,13 +1,10 @@
 package com.beanit.iec61850bean;
 
-public final class GooseControlBlock {
+public final class GooseControlBlock extends ControlBlock {
 
-  private final boolean enabled;
-  private final String controlBlockReference;
   private final String destinationMacAddress;
   private final String applicationId;
   private final String gooseId;
-  private final String dataSetReference;
   private final String vlanId;
   private final String vlanPriority;
   private final String needCommissioning;
@@ -24,24 +21,14 @@ public final class GooseControlBlock {
       String vlanPriority,
       String needCommissioning,
       String configurationRevision) {
-    this.enabled = enabled;
-    this.controlBlockReference = controlBlockReference;
+    super(enabled, controlBlockReference, dataSetReference);
     this.destinationMacAddress = destinationMacAddress;
     this.applicationId = applicationId;
     this.gooseId = gooseId;
-    this.dataSetReference = dataSetReference;
     this.vlanId = vlanId;
     this.vlanPriority = vlanPriority;
     this.needCommissioning = needCommissioning;
     this.configurationRevision = configurationRevision;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  public String getControlBlockReference() {
-    return controlBlockReference;
   }
 
   public String getDestinationMacAddress() {
@@ -54,10 +41,6 @@ public final class GooseControlBlock {
 
   public String getGooseId() {
     return gooseId;
-  }
-
-  public String getDataSetReference() {
-    return dataSetReference;
   }
 
   public String getVlanId() {
