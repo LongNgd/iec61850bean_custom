@@ -527,6 +527,12 @@ public class SclParser {
       throw new SclParseException("Report Control Block has no name attribute.");
     }
 
+    boolean indexed = true;
+    Node indexedAttribute = rcbNodeAttributes.getNamedItem("indexed");
+    if (indexedAttribute != null) {
+      indexed = !"false".equalsIgnoreCase(indexedAttribute.getNodeValue());
+    }
+
     int maxInstances = 1;
     for (int i = 0; i < xmlNode.getChildNodes().getLength(); i++) {
       Node childNode = xmlNode.getChildNodes().item(i);
@@ -534,14 +540,18 @@ public class SclParser {
       if ("RptEnabled".equals(childNode.getNodeName())) {
         Node rptEnabledMaxAttr = childNode.getAttributes().getNamedItem("max");
         if (rptEnabledMaxAttr != null) {
-          // maxInstances = Integer.parseInt(rptEnabledMaxAttr.getNodeValue());
-          // if (maxInstances < 1 || maxInstances > 99) {
-          // throw new SclParseException(
-          // "Report Control Block max instances should be between 1 and 99 but is: "
-          // + maxInstances);
-          // }
+          maxInstances = Integer.parseInt(rptEnabledMaxAttr.getNodeValue());
+          if (maxInstances < 1 || maxInstances > 99) {
+            throw new SclParseException(
+                "Report Control Block max instances should be between 1 and 99 but is: "
+                    + maxInstances);
+          }
         }
       }
+    }
+
+    if (!indexed) {
+      maxInstances = 1;
     }
 
     List<Rcb> rcbInstances = new ArrayList<>(maxInstances);
@@ -836,10 +846,12 @@ public class SclParser {
       dataSetReference = parentRef + "$" + datSetAttr.getNodeValue();
     }
 
-    // Get gooseId attribute
+    // Get applicationId/gooseId attribute
     String gooseId = null;
+    String applicationId = null;
     Node gooseIdAttr = attributes.getNamedItem("appID");
     if (gooseIdAttr != null) {
+      applicationId = gooseIdAttr.getNodeValue();
       gooseId = gooseIdAttr.getNodeValue();
     }
 
@@ -884,6 +896,9 @@ public class SclParser {
                   if ("MAC-Address".equals(pType)) {
                     destinationMacAddress = pValue.replace("-", ":");
                   } else if ("APPID".equals(pType)) {
+                    if (applicationId == null) {
+                      applicationId = pValue;
+                    }
                     if (gooseId == null) {
                       gooseId = pValue;
                     }
@@ -905,9 +920,6 @@ public class SclParser {
 
     // needCommissioning attribute (optional)
     String needCommissioning = null;
-
-    // applicationId attribute (optional)
-    String applicationId = null;
 
     // Create the Goose
     ObjectReference objectReference = new ObjectReference(controlBlockReference.replace("$", "."));
