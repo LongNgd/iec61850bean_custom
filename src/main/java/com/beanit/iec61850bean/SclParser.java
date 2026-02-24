@@ -47,6 +47,7 @@ public class SclParser {
   private final List<LnSubDef> dataSetDefs = new ArrayList<>();
   private final List<Goose> geese = new ArrayList<>();
   private final List<SettingGroup> settingGroups = new ArrayList<>();
+  private List<String> currentLogicalDeviceInsts = new ArrayList<>();
   private TypeDefinitions typeDefinitions;
   private Document doc;
   private String iedName;
@@ -192,6 +193,7 @@ public class SclParser {
 
     NodeList elements = serverXMLNode.getChildNodes();
     List<LogicalDevice> logicalDevices = new ArrayList<>(elements.getLength());
+    currentLogicalDeviceInsts = extractLogicalDeviceInsts(serverXMLNode);
 
     for (int i = 0; i < elements.getLength(); i++) {
       Node element = elements.item(i);
@@ -251,8 +253,36 @@ public class SclParser {
 
     // Clear the list for the next server model
     settingGroups.clear();
+    currentLogicalDeviceInsts.clear();
 
     return serverModel;
+  }
+
+  private List<String> extractLogicalDeviceInsts(Node serverXmlNode) {
+
+    List<String> logicalDeviceInsts = new ArrayList<>();
+    NodeList elements = serverXmlNode.getChildNodes();
+
+    for (int i = 0; i < elements.getLength(); i++) {
+      Node element = elements.item(i);
+      if (!"LDevice".equals(element.getNodeName())) {
+        continue;
+      }
+
+      Node instAttribute = element.getAttributes().getNamedItem("inst");
+      if (instAttribute == null) {
+        continue;
+      }
+
+      String logicalDeviceInst = instAttribute.getNodeValue();
+      if (logicalDeviceInst != null
+          && !logicalDeviceInst.isEmpty()
+          && !logicalDeviceInsts.contains(logicalDeviceInst)) {
+        logicalDeviceInsts.add(logicalDeviceInst);
+      }
+    }
+
+    return logicalDeviceInsts;
   }
 
   private LogicalDevice createNewLDevice(Node ldXmlNode) throws SclParseException {
@@ -1109,6 +1139,7 @@ public class SclParser {
     String numOfSGs = "0";
     String actSG = "0";
     String resvTms = null;
+    List<String> affectedLogicalDevices = null;
 
     Node attribute = attributes.getNamedItem("numOfSGs");
     if (attribute != null) {
@@ -1123,6 +1154,17 @@ public class SclParser {
       resvTms = attribute.getNodeValue();
     }
 
+    attribute = attributes.getNamedItem("affectedLogicalDevices");
+    if (attribute == null) {
+      attribute = attributes.getNamedItem("esel:affectedLogicalDevices");
+    }
+    if (attribute != null) {
+      affectedLogicalDevices = parseCsvAttribute(attribute.getNodeValue());
+    }
+    if (affectedLogicalDevices == null || affectedLogicalDevices.isEmpty()) {
+      affectedLogicalDevices = new ArrayList<>(currentLogicalDeviceInsts);
+    }
+
     String controlBlock = parentRef + ".SGCB";
 
     return new SettingGroup(
@@ -1132,7 +1174,25 @@ public class SclParser {
         actSG,
         null,
         resvTms,
-        null);
+        affectedLogicalDevices);
+  }
+
+  private List<String> parseCsvAttribute(String value) {
+
+    List<String> values = new ArrayList<>();
+    if (value == null || value.trim().isEmpty()) {
+      return values;
+    }
+
+    String[] splitValues = value.split(",");
+    for (String splitValue : splitValues) {
+      String trimmedValue = splitValue.trim();
+      if (!trimmedValue.isEmpty()) {
+        values.add(trimmedValue);
+      }
+    }
+
+    return values;
   }
 
   private List<FcDataObject> createFcDataObjects(

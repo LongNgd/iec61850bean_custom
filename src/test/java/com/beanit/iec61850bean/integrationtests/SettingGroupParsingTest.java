@@ -6,6 +6,7 @@ import com.beanit.iec61850bean.ServerModel;
 import com.beanit.iec61850bean.SettingGroup;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,7 +39,12 @@ public class SettingGroupParsingTest {
         // esel:numberOfSettingGroupsLabel="MAXGRP" numOfSGs="6" />
 
         assertEquals("6", sg.getNumberOfSettingGroups());
-        assertEquals("0", sg.getActiveSettingGroup(), "Default activity setting group should be 0 if not specified");
+        assertEquals("0", sg.getActiveSettingGroup(), "Default active setting group should be 0 if not specified");
+        assertEquals(
+                Arrays.asList("CFG", "PRO", "MET", "CON", "ANN"),
+                sg.getAffectedLogicalDevices(),
+                "Affected logical devices should include all logical devices in the IED"
+        );
 
         // Expected Reference: SEL_487ECFG/LLN0.SGCB
         assertTrue(sg.getControlBlock().contains("LLN0.SGCB"));
