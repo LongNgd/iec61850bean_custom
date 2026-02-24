@@ -51,6 +51,10 @@ public final class Goose extends ModelNode {
     sb.append("needCommissioning: ").append(controlBlock.getNeedCommissioning());
     sb.append("\n");
     sb.append("configurationRevision: ").append(controlBlock.getConfigurationRevision());
+    sb.append("\n");
+    sb.append("minTime: ").append(controlBlock.getMinTime());
+    sb.append("\n");
+    sb.append("maxTime: ").append(controlBlock.getMaxTime());
 
     return sb.toString();
   }

@@ -291,7 +291,7 @@ public class SclParser {
       Node element = elements.item(i);
 
       if (element.getNodeName().equals("LN") || element.getNodeName().equals("LN0")) {
-        logicalNodes.add(createNewLogicalNode(element, ref));
+        logicalNodes.add(createNewLogicalNode(element, ref, inst));
       }
     }
 
@@ -300,7 +300,7 @@ public class SclParser {
     return lDevice;
   }
 
-  private LogicalNode createNewLogicalNode(Node lnXmlNode, String parentRef)
+  private LogicalNode createNewLogicalNode(Node lnXmlNode, String parentRef, String logicalDeviceInst)
       throws SclParseException {
 
     // attributes not needed: desc
@@ -388,7 +388,7 @@ public class SclParser {
     for (int i = 0; i < lnXmlNode.getChildNodes().getLength(); i++) {
       Node childNode = lnXmlNode.getChildNodes().item(i);
       if ("GSEControl".equals(childNode.getNodeName())) {
-        Goose gcb = createGoose(childNode, ref);
+        Goose gcb = createGoose(childNode, ref, logicalDeviceInst);
         if (gcb != null) {
           geese.add(gcb);
         }
@@ -824,7 +824,7 @@ public class SclParser {
     return rcbInstances;
   }
 
-  private Goose createGoose(Node gseControlNode, String parentRef)
+  private Goose createGoose(Node gseControlNode, String parentRef, String logicalDeviceInst)
       throws SclParseException {
 
     NamedNodeMap attributes = gseControlNode.getAttributes();
@@ -870,10 +870,24 @@ public class SclParser {
       return null;
     }
 
+    GooseCommunicationInfo communicationInfo =
+        findGooseCommunicationInfo(logicalDeviceInst, name);
+
     // Parse Address sub-element for MAC address, APPID, VLAN-ID, VLAN-PRIORITY
     String destinationMacAddress = null;
     String vlanId = null;
     String vlanPriority = null;
+    String minTime = null;
+    String maxTime = null;
+
+    if (communicationInfo != null) {
+      destinationMacAddress = communicationInfo.destinationMacAddress;
+      applicationId = communicationInfo.applicationId;
+      vlanId = communicationInfo.vlanId;
+      vlanPriority = communicationInfo.vlanPriority;
+      minTime = communicationInfo.minTime;
+      maxTime = communicationInfo.maxTime;
+    }
 
     NodeList gseControlChildren = gseControlNode.getChildNodes();
     for (int i = 0; i < gseControlChildren.getLength(); i++) {
@@ -895,14 +909,20 @@ public class SclParser {
                   if ("MAC-Address".equals(pType)) {
                     destinationMacAddress = pValue.replace("-", ":");
                   } else if ("APPID".equals(pType)) {
-                    applicationId = parseHexOrDecimalString(pValue);
+                    if (applicationId == null) {
+                      applicationId = formatApplicationId(pValue);
+                    }
                     if (gooseId == null) {
                       gooseId = pValue;
                     }
                   } else if ("VLAN-ID".equals(pType)) {
-                    vlanId = parseDecimalString(pValue);
+                    if (vlanId == null) {
+                      vlanId = parseDecimalString(pValue);
+                    }
                   } else if ("VLAN-PRIORITY".equals(pType)) {
-                    vlanPriority = parseDecimalString(pValue);
+                    if (vlanPriority == null) {
+                      vlanPriority = parseDecimalString(pValue);
+                    }
                   }
                 }
               }
@@ -935,21 +955,100 @@ public class SclParser {
             vlanId,
             vlanPriority,
             needCommissioning,
-            configurationRevision);
+            configurationRevision,
+            minTime,
+            maxTime);
 
     return new Goose(objectReference, gooseControlBlock, null);
   }
 
-  private String parseHexOrDecimalString(String value) {
+  private GooseCommunicationInfo findGooseCommunicationInfo(String logicalDeviceInst, String cbName) {
+    NodeList connectedApNodes = doc.getElementsByTagName("ConnectedAP");
+    for (int i = 0; i < connectedApNodes.getLength(); i++) {
+      Node connectedApNode = connectedApNodes.item(i);
+      Node connectedApIedName = connectedApNode.getAttributes().getNamedItem("iedName");
+      if (connectedApIedName == null || !iedName.equals(connectedApIedName.getNodeValue())) {
+        continue;
+      }
+
+      NodeList connectedApChildren = connectedApNode.getChildNodes();
+      for (int j = 0; j < connectedApChildren.getLength(); j++) {
+        Node childNode = connectedApChildren.item(j);
+        if (!"GSE".equals(childNode.getNodeName())) {
+          continue;
+        }
+
+        NamedNodeMap gseAttributes = childNode.getAttributes();
+        Node ldInstAttribute = gseAttributes.getNamedItem("ldInst");
+        Node cbNameAttribute = gseAttributes.getNamedItem("cbName");
+        if (ldInstAttribute == null
+            || cbNameAttribute == null
+            || !logicalDeviceInst.equals(ldInstAttribute.getNodeValue())
+            || !cbName.equals(cbNameAttribute.getNodeValue())) {
+          continue;
+        }
+
+        GooseCommunicationInfo info = new GooseCommunicationInfo();
+        NodeList gseChildren = childNode.getChildNodes();
+        for (int k = 0; k < gseChildren.getLength(); k++) {
+          Node gseChild = gseChildren.item(k);
+          if ("Address".equals(gseChild.getNodeName())) {
+            parseGooseCommunicationAddress(gseChild, info);
+          } else if ("MinTime".equals(gseChild.getNodeName())) {
+            info.minTime = gseChild.getTextContent().trim();
+          } else if ("MaxTime".equals(gseChild.getNodeName())) {
+            info.maxTime = gseChild.getTextContent().trim();
+          }
+        }
+        return info;
+      }
+    }
+
+    return null;
+  }
+
+  private void parseGooseCommunicationAddress(Node addressNode, GooseCommunicationInfo info) {
+    NodeList addressChildren = addressNode.getChildNodes();
+    for (int i = 0; i < addressChildren.getLength(); i++) {
+      Node childNode = addressChildren.item(i);
+      if (!"P".equals(childNode.getNodeName())) {
+        continue;
+      }
+
+      Node pTypeNode = childNode.getAttributes().getNamedItem("type");
+      if (pTypeNode == null) {
+        continue;
+      }
+
+      String pType = pTypeNode.getNodeValue();
+      String pValue = childNode.getTextContent();
+      if ("MAC-Address".equals(pType)) {
+        info.destinationMacAddress = pValue.replace("-", ":");
+      } else if ("APPID".equals(pType)) {
+        info.applicationId = formatApplicationId(pValue);
+      } else if ("VLAN-ID".equals(pType)) {
+        info.vlanId = parseDecimalString(pValue);
+      } else if ("VLAN-PRIORITY".equals(pType)) {
+        info.vlanPriority = parseDecimalString(pValue);
+      }
+    }
+  }
+
+  private String formatApplicationId(String value) {
     String trimmedValue = value.trim();
     if (trimmedValue.matches("[0-9a-fA-F]+")) {
       try {
-        return Integer.toString(Integer.parseInt(trimmedValue, 16));
+        String normalizedHex = trimmedValue.toUpperCase();
+        if (normalizedHex.length() <= 4) {
+          normalizedHex = String.format("%4s", normalizedHex).replace(' ', '0');
+        }
+        int decimalValue = Integer.parseInt(normalizedHex, 16);
+        return normalizedHex + " (" + decimalValue + ")";
       } catch (NumberFormatException e) {
         return trimmedValue;
       }
     }
-    return parseDecimalString(trimmedValue);
+    return trimmedValue;
   }
 
   private String parseDecimalString(String value) {
@@ -962,6 +1061,15 @@ public class SclParser {
       }
     }
     return trimmedValue;
+  }
+
+  private static final class GooseCommunicationInfo {
+    private String destinationMacAddress;
+    private String applicationId;
+    private String vlanId;
+    private String vlanPriority;
+    private String minTime;
+    private String maxTime;
   }
 
   private String buildTriggerOptions(

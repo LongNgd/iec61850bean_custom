@@ -57,7 +57,8 @@ public class GooseParsingTest {
             GooseControlBlock controlBlock = gcb.getControlBlock();
             if (controlBlock.getControlBlockReference().contains("gcb01")) {
                 foundGcb01 = true;
-                assertEquals("F650_GOOSE1", controlBlock.getApplicationId());
+                assertEquals("0001 (1)", controlBlock.getApplicationId());
+                assertEquals("F650_GOOSE1", controlBlock.getGooseId());
                 assertNotNull(controlBlock.getDataSetReference());
                 assertTrue(controlBlock.getDataSetReference().contains("GOOSE1"));
                 assertNotNull(gcb.getDataSet());
@@ -97,17 +98,23 @@ public class GooseParsingTest {
             GooseControlBlock controlBlock = goose.getControlBlock();
             String reference = controlBlock.getControlBlockReference();
             if (reference.contains("GSE_487E_02")) {
-                assertEquals("48", controlBlock.getApplicationId());
+                assertEquals("0030 (48)", controlBlock.getApplicationId());
                 assertEquals("487E_GSE02", controlBlock.getGooseId());
                 assertEquals("1", controlBlock.getVlanId());
+                assertEquals("4", controlBlock.getMinTime());
+                assertEquals("1000", controlBlock.getMaxTime());
             } else if (reference.contains("GSE_487E_03")) {
-                assertEquals("49", controlBlock.getApplicationId());
+                assertEquals("0031 (49)", controlBlock.getApplicationId());
                 assertEquals("487E_GSE03", controlBlock.getGooseId());
                 assertEquals("1", controlBlock.getVlanId());
+                assertEquals("4", controlBlock.getMinTime());
+                assertEquals("1000", controlBlock.getMaxTime());
             } else if (reference.contains("GSE_487E_04")) {
-                assertEquals("50", controlBlock.getApplicationId());
+                assertEquals("0032 (50)", controlBlock.getApplicationId());
                 assertEquals("GSE_487E_04", controlBlock.getGooseId());
                 assertEquals("1", controlBlock.getVlanId());
+                assertEquals("4", controlBlock.getMinTime());
+                assertEquals("1000", controlBlock.getMaxTime());
             }
         }
     }

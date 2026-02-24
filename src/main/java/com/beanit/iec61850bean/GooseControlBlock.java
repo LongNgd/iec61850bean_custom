@@ -9,6 +9,8 @@ public final class GooseControlBlock extends ControlBlock {
   private final String vlanPriority;
   private final String needCommissioning;
   private final String configurationRevision;
+  private final String minTime;
+  private final String maxTime;
 
   public GooseControlBlock(
       boolean enabled,
@@ -20,7 +22,9 @@ public final class GooseControlBlock extends ControlBlock {
       String vlanId,
       String vlanPriority,
       String needCommissioning,
-      String configurationRevision) {
+      String configurationRevision,
+      String minTime,
+      String maxTime) {
     super(enabled, controlBlockReference, dataSetReference);
     this.destinationMacAddress = destinationMacAddress;
     this.applicationId = applicationId;
@@ -29,6 +33,8 @@ public final class GooseControlBlock extends ControlBlock {
     this.vlanPriority = vlanPriority;
     this.needCommissioning = needCommissioning;
     this.configurationRevision = configurationRevision;
+    this.minTime = minTime;
+    this.maxTime = maxTime;
   }
 
   public String getDestinationMacAddress() {
@@ -57,5 +63,13 @@ public final class GooseControlBlock extends ControlBlock {
 
   public String getConfigurationRevision() {
     return configurationRevision;
+  }
+
+  public String getMinTime() {
+    return minTime;
+  }
+
+  public String getMaxTime() {
+    return maxTime;
   }
 }
