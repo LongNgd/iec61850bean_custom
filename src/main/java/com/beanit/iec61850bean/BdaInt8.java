@@ -31,6 +31,7 @@ public final class BdaInt8 extends BasicDataAttribute {
   @Override
   public void setValueFrom(BasicDataAttribute bda) {
     value = ((BdaInt8) bda).getValue();
+    copyValueSetFrom(bda);
   }
 
   public byte getValue() {
@@ -39,10 +40,12 @@ public final class BdaInt8 extends BasicDataAttribute {
 
   public void setValue(byte value) {
     this.value = value;
+    setValueSet();
   }
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = 0;
   }
 
@@ -71,6 +74,7 @@ public final class BdaInt8 extends BasicDataAttribute {
       throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: integer");
     }
     value = data.getInteger().value.byteValue();
+    setValueSet();
   }
 
   @Override
@@ -82,11 +86,11 @@ public final class BdaInt8 extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + value;
+    return formatToString("" + value);
   }
 
   @Override
   public String getValueString() {
-    return "" + value;
+    return formatValueString("" + value);
   }
 }

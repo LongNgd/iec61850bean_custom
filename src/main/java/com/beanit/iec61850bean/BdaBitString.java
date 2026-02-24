@@ -44,6 +44,7 @@ public abstract class BdaBitString extends BasicDataAttribute {
       throw new IllegalArgumentException("value does not have correct length.");
     }
     this.value = value;
+    setValueSet();
   }
 
   @Override
@@ -53,6 +54,7 @@ public abstract class BdaBitString extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public int getMaxNumBits() {
@@ -62,6 +64,7 @@ public abstract class BdaBitString extends BasicDataAttribute {
   /** Initializes BIT_STRING with all zeros */
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[(maxNumBits - 1) / 8 + 1];
   }
 
@@ -87,6 +90,7 @@ public abstract class BdaBitString extends BasicDataAttribute {
               + maxNumBits);
     }
     value = data.getBitString().value;
+    setValueSet();
   }
 
   @Override
@@ -98,11 +102,11 @@ public abstract class BdaBitString extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + HexString.fromBytes(value);
+    return formatToString(HexString.fromBytes(value));
   }
 
   @Override
   public String getValueString() {
-    return HexString.fromBytes(value);
+    return formatValueString(HexString.fromBytes(value));
   }
 }

@@ -48,6 +48,7 @@ public final class BdaVisibleString extends BasicDataAttribute {
           "value was null or VISIBLE_STRING value size exceeds maxLength of " + maxLength);
     }
     this.value = value;
+    setValueSet();
   }
 
   public void setValue(String value) {
@@ -61,6 +62,7 @@ public final class BdaVisibleString extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public int getMaxLength() {
@@ -73,6 +75,7 @@ public final class BdaVisibleString extends BasicDataAttribute {
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[0];
   }
 
@@ -103,6 +106,7 @@ public final class BdaVisibleString extends BasicDataAttribute {
       throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: visible_string");
     }
     value = data.getVisibleString().value;
+    setValueSet();
   }
 
   @Override
@@ -114,17 +118,22 @@ public final class BdaVisibleString extends BasicDataAttribute {
 
   @Override
   public String toString() {
+    String valueString;
     if (value == null) {
-      return getReference().toString() + ": null";
+      valueString = "null";
+    } else if (value.length == 0 || value[0] == (byte) 0) {
+      valueString = "''";
+    } else {
+      valueString = new String(value, UTF_8);
     }
-    if (value.length == 0 || value[0] == (byte) 0) {
-      return getReference().toString() + ": ''";
-    }
-    return getReference().toString() + ": " + new String(value, UTF_8);
+    return formatToString(valueString);
   }
 
   @Override
   public String getValueString() {
-    return new String(value, UTF_8);
+    if (value == null) {
+      return formatValueString("");
+    }
+    return formatValueString(new String(value, UTF_8));
   }
 }

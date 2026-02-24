@@ -25,6 +25,7 @@ public final class BdaTapCommand extends BdaBitString {
   /** Sets the value to TapCommand.STOP */
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[] {0x00};
   }
 
@@ -60,6 +61,7 @@ public final class BdaTapCommand extends BdaBitString {
   }
 
   public void setTapCommand(TapCommand tapCommand) {
+    setValueSet();
     if (tapCommand == TapCommand.RESERVED) {
       value[0] = (byte) 0xC0;
     } else if (tapCommand == TapCommand.HIGHER) {

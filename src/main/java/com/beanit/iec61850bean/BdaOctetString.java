@@ -47,6 +47,7 @@ public final class BdaOctetString extends BasicDataAttribute {
           "OCTET_STRING value size exceeds maxLength of " + maxLength);
     }
     this.value = value;
+    setValueSet();
   }
 
   @Override
@@ -56,6 +57,7 @@ public final class BdaOctetString extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public int getMaxLength() {
@@ -64,6 +66,7 @@ public final class BdaOctetString extends BasicDataAttribute {
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[0];
   }
 
@@ -94,6 +97,7 @@ public final class BdaOctetString extends BasicDataAttribute {
       throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: octet_string");
     }
     value = data.getOctetString().value;
+    setValueSet();
   }
 
   @Override
@@ -105,6 +109,7 @@ public final class BdaOctetString extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + Arrays.toString(value);
+    String valueString = value == null ? "null" : Arrays.toString(value);
+    return formatToString(valueString);
   }
 }

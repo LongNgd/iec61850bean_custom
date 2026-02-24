@@ -40,6 +40,7 @@ public final class BdaReasonForInclusion extends BdaBitString {
   }
 
   public void setDataChange(boolean dataChange) {
+    setValueSet();
     if (dataChange) {
       value[0] = (byte) (value[0] | 0x40);
     } else {
@@ -52,6 +53,7 @@ public final class BdaReasonForInclusion extends BdaBitString {
   }
 
   public void setQualityChange(boolean qualityChange) {
+    setValueSet();
     if (qualityChange) {
       value[0] = (byte) (value[0] | 0x20);
     } else {
@@ -64,6 +66,7 @@ public final class BdaReasonForInclusion extends BdaBitString {
   }
 
   public void setDataUpdate(boolean dataUpdate) {
+    setValueSet();
     if (dataUpdate) {
       value[0] = (byte) (value[0] | 0x10);
     } else {
@@ -76,6 +79,7 @@ public final class BdaReasonForInclusion extends BdaBitString {
   }
 
   public void setIntegrity(boolean integrity) {
+    setValueSet();
     if (integrity) {
       value[0] = (byte) (value[0] | 0x08);
     } else {
@@ -88,6 +92,7 @@ public final class BdaReasonForInclusion extends BdaBitString {
   }
 
   public void setGeneralInterrogation(boolean generalInterrogation) {
+    setValueSet();
     if (generalInterrogation) {
       value[0] = (byte) (value[0] | 0x04);
     } else {
@@ -100,6 +105,7 @@ public final class BdaReasonForInclusion extends BdaBitString {
   }
 
   public void setApplicationTrigger(boolean applicationTrigger) {
+    setValueSet();
     if (applicationTrigger) {
       value[0] = (byte) (value[0] | 0x02);
     } else {
@@ -109,6 +115,9 @@ public final class BdaReasonForInclusion extends BdaBitString {
 
   @Override
   public String toString() {
+    if (!isValueSet()) {
+      return "";
+    }
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     if (isDataChange()) {
@@ -165,6 +174,6 @@ public final class BdaReasonForInclusion extends BdaBitString {
       sb.append("application-trigger");
     }
 
-    return sb.toString();
+    return formatValueString(sb.toString());
   }
 }

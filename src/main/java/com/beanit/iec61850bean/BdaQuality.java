@@ -24,6 +24,7 @@ public final class BdaQuality extends BdaBitString {
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[] {0x00, 0x00};
   }
 
@@ -58,6 +59,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setValidity(Validity validity) {
+    setValueSet();
     if (validity == Validity.QUESTIONABLE) {
       value[0] = (byte) (value[0] | 0xC0);
     } else if (validity == Validity.RESERVED) {
@@ -76,6 +78,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setOverflow(boolean overflow) {
+    setValueSet();
     if (overflow) {
       value[0] = (byte) (value[0] | 0x20);
     } else {
@@ -88,6 +91,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setOutOfRange(boolean outOfRange) {
+    setValueSet();
     if (outOfRange) {
       value[0] = (byte) (value[0] | 0x10);
     } else {
@@ -100,6 +104,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setBadReference(boolean badReference) {
+    setValueSet();
     if (badReference) {
       value[0] = (byte) (value[0] | 0x08);
     } else {
@@ -112,6 +117,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setOscillatory(boolean oscillatory) {
+    setValueSet();
     if (oscillatory) {
       value[0] = (byte) (value[0] | 0x04);
     } else {
@@ -124,6 +130,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setFailure(boolean failure) {
+    setValueSet();
     if (failure) {
       value[0] = (byte) (value[0] | 0x02);
     } else {
@@ -136,6 +143,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setOldData(boolean oldData) {
+    setValueSet();
     if (oldData) {
       value[0] = (byte) (value[0] | 0x01);
     } else {
@@ -148,6 +156,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setInconsistent(boolean inconsistent) {
+    setValueSet();
     if (inconsistent) {
       value[1] = (byte) (value[0] | 0x80);
     } else {
@@ -160,6 +169,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setInaccurate(boolean inaccurate) {
+    setValueSet();
     if (inaccurate) {
       value[1] = (byte) (value[0] | 0x40);
     } else {
@@ -172,6 +182,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setSubstituted(boolean substituted) {
+    setValueSet();
     if (substituted) {
       value[1] = (byte) (value[0] | 0x20);
     } else {
@@ -184,6 +195,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setTest(boolean test) {
+    setValueSet();
     if (test) {
       value[1] = (byte) (value[0] | 0x10);
     } else {
@@ -196,6 +208,7 @@ public final class BdaQuality extends BdaBitString {
   }
 
   public void setOperatorBlocked(boolean operatorBlocked) {
+    setValueSet();
     if (operatorBlocked) {
       value[1] = (byte) (value[0] | 0x08);
     } else {
@@ -205,7 +218,7 @@ public final class BdaQuality extends BdaBitString {
 
   @Override
   public String getValueString() {
-    return getValidity().toString();
+    return formatValueString(getValidity().toString());
   }
 
   public enum Validity {

@@ -48,6 +48,7 @@ public final class BdaUnicodeString extends BasicDataAttribute {
           "Value was null or UNICODE_STRING value size exceeds maxLength of " + maxLength);
     }
     this.value = value;
+    setValueSet();
   }
 
   @Override
@@ -57,6 +58,7 @@ public final class BdaUnicodeString extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public int getMaxLength() {
@@ -65,6 +67,7 @@ public final class BdaUnicodeString extends BasicDataAttribute {
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[0];
   }
 
@@ -96,6 +99,7 @@ public final class BdaUnicodeString extends BasicDataAttribute {
           ServiceError.TYPE_CONFLICT, "expected type: mms_string/unicode_string");
     }
     value = data.getMMSString().value;
+    setValueSet();
   }
 
   @Override
@@ -108,8 +112,8 @@ public final class BdaUnicodeString extends BasicDataAttribute {
   @Override
   public String toString() {
     if (value == null) {
-      return getReference().toString() + ": null";
+      return formatToString("null");
     }
-    return getReference().toString() + ": " + new String(value, UTF_8);
+    return formatToString(new String(value, UTF_8));
   }
 }

@@ -23,6 +23,7 @@ public final class BdaTriggerConditions extends BdaBitString {
 
   @Override
   public void setDefault() {
+    clearValueSet();
     /* default of GI is true by default in IEC 61850-6 sec. 9.3.8 */
     value = new byte[] {0x04};
   }
@@ -46,6 +47,7 @@ public final class BdaTriggerConditions extends BdaBitString {
   }
 
   public void setDataChange(boolean dataChange) {
+    setValueSet();
     if (dataChange) {
       value[0] = (byte) (value[0] | 0x40);
     } else {
@@ -58,6 +60,7 @@ public final class BdaTriggerConditions extends BdaBitString {
   }
 
   public void setQualityChange(boolean qualityChange) {
+    setValueSet();
     if (qualityChange) {
       value[0] = (byte) (value[0] | 0x20);
     } else {
@@ -70,6 +73,7 @@ public final class BdaTriggerConditions extends BdaBitString {
   }
 
   public void setDataUpdate(boolean dataUpdate) {
+    setValueSet();
     if (dataUpdate) {
       value[0] = (byte) (value[0] | 0x10);
     } else {
@@ -82,6 +86,7 @@ public final class BdaTriggerConditions extends BdaBitString {
   }
 
   public void setIntegrity(boolean integrity) {
+    setValueSet();
     if (integrity) {
       value[0] = (byte) (value[0] | 0x08);
     } else {
@@ -94,6 +99,7 @@ public final class BdaTriggerConditions extends BdaBitString {
   }
 
   public void setGeneralInterrogation(boolean generalInterrogation) {
+    setValueSet();
     if (generalInterrogation) {
       value[0] = (byte) (value[0] | 0x04);
     } else {
@@ -103,7 +109,9 @@ public final class BdaTriggerConditions extends BdaBitString {
 
   @Override
   public String toString() {
-
+    if (!isValueSet()) {
+      return formatToString("null");
+    }
     return super.toString()
         + ", data change: "
         + isDataChange()

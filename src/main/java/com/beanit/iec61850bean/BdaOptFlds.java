@@ -23,6 +23,7 @@ public final class BdaOptFlds extends BdaBitString {
 
   @Override
   public void setDefault() {
+    clearValueSet();
     /* default of buffer overflow is true by default in IEC 61850-6 sec. 9.3.8 */
     value = new byte[] {0x02, 0x00};
   }
@@ -46,6 +47,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setSequenceNumber(boolean sequenceNumber) {
+    setValueSet();
     if (sequenceNumber) {
       value[0] = (byte) (value[0] | 0x40);
     } else {
@@ -58,6 +60,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setReportTimestamp(boolean reportTimestamp) {
+    setValueSet();
     if (reportTimestamp) {
       value[0] = (byte) (value[0] | 0x20);
     } else {
@@ -70,6 +73,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setReasonForInclusion(boolean reasonForInclusion) {
+    setValueSet();
     if (reasonForInclusion) {
       value[0] = (byte) (value[0] | 0x10);
     } else {
@@ -87,6 +91,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setDataSetName(boolean dataSetName) {
+    setValueSet();
     if (dataSetName) {
       value[0] = (byte) (value[0] | 0x08);
     } else {
@@ -99,6 +104,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setDataReference(boolean dataReference) {
+    setValueSet();
     if (dataReference) {
       value[0] = (byte) (value[0] | 0x04);
     } else {
@@ -111,6 +117,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setBufferOverflow(boolean bufferOverflow) {
+    setValueSet();
     if (bufferOverflow) {
       value[0] = (byte) (value[0] | 0x02);
     } else {
@@ -123,6 +130,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setEntryId(boolean entryId) {
+    setValueSet();
     if (entryId) {
       value[0] = (byte) (value[0] | 0x01);
     } else {
@@ -135,6 +143,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setConfigRevision(boolean configRevision) {
+    setValueSet();
     if (configRevision) {
       value[1] = (byte) (value[1] | 0x80);
     } else {
@@ -147,6 +156,7 @@ public final class BdaOptFlds extends BdaBitString {
   }
 
   public void setSegmentation(boolean segmentation) {
+    setValueSet();
     if (segmentation) {
       value[1] = (byte) (value[1] | 0x40);
     } else {

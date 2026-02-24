@@ -32,6 +32,7 @@ public final class BdaBoolean extends BasicDataAttribute {
   @Override
   public void setValueFrom(BasicDataAttribute bda) {
     value = ((BdaBoolean) bda).getValue();
+    copyValueSetFrom(bda);
   }
 
   public boolean getValue() {
@@ -40,10 +41,12 @@ public final class BdaBoolean extends BasicDataAttribute {
 
   public void setValue(boolean value) {
     this.value = value;
+    setValueSet();
   }
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = false;
   }
 
@@ -72,6 +75,7 @@ public final class BdaBoolean extends BasicDataAttribute {
       throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: boolean");
     }
     value = data.getBool().value;
+    setValueSet();
   }
 
   @Override
@@ -83,11 +87,11 @@ public final class BdaBoolean extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + value;
+    return formatToString("" + value);
   }
 
   @Override
   public String getValueString() {
-    return "" + value;
+    return formatValueString("" + value);
   }
 }

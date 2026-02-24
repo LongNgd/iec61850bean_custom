@@ -72,10 +72,11 @@ public final class BdaTimestamp extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public Instant getInstant() {
-    if (value == null || value.length == 0) {
+    if (!isValueSet() || value == null || value.length == 0) {
       return null;
     }
     long time =
@@ -123,6 +124,7 @@ public final class BdaTimestamp extends BasicDataAttribute {
           (byte) (fractionOfSecond & 0xff),
           (byte) timeQuality
         };
+    setValueSet();
   }
 
   public byte[] getValue() {
@@ -134,6 +136,7 @@ public final class BdaTimestamp extends BasicDataAttribute {
       this.value = new byte[8];
     }
     this.value = value;
+    setValueSet();
   }
 
   /**
@@ -186,6 +189,7 @@ public final class BdaTimestamp extends BasicDataAttribute {
   /** Sets Timestamp the empty byte array (indicating an invalid Timestamp) */
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[8];
   }
 
@@ -221,6 +225,7 @@ public final class BdaTimestamp extends BasicDataAttribute {
       throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: utc_time/timestamp");
     }
     value = data.getUtcTime().value;
+    setValueSet();
   }
 
   @Override
@@ -232,11 +237,11 @@ public final class BdaTimestamp extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + getInstant();
+    return formatToString("" + getInstant());
   }
 
   @Override
   public String getValueString() {
-    return getInstant().toString();
+    return formatValueString("" + getInstant());
   }
 }

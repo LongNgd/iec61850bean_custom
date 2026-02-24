@@ -37,6 +37,7 @@ public final class BdaFloat32 extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public byte[] getValue() {
@@ -45,9 +46,13 @@ public final class BdaFloat32 extends BasicDataAttribute {
 
   public void setValue(byte[] value) {
     this.value = value;
+    setValueSet();
   }
 
   public Float getFloat() {
+    if (!isValueSet() || value == null) {
+      return null;
+    }
     return Float.intBitsToFloat(
         ((0xff & value[1]) << 24)
             | ((0xff & value[2]) << 16)
@@ -57,10 +62,12 @@ public final class BdaFloat32 extends BasicDataAttribute {
 
   public void setFloat(Float value) {
     this.value = ByteBuffer.allocate(1 + 4).put((byte) 8).putFloat(value).array();
+    setValueSet();
   }
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[] {8, 0, 0, 0, 0};
   }
 
@@ -95,6 +102,7 @@ public final class BdaFloat32 extends BasicDataAttribute {
           ServiceError.TYPE_CONFLICT, "expected type: floating_point as an octet string of size 5");
     }
     value = data.getFloatingPoint().value;
+    setValueSet();
   }
 
   @Override
@@ -111,11 +119,11 @@ public final class BdaFloat32 extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + getFloat();
+    return formatToString("" + getFloat());
   }
 
   @Override
   public String getValueString() {
-    return getFloat().toString();
+    return formatValueString("" + getFloat());
   }
 }

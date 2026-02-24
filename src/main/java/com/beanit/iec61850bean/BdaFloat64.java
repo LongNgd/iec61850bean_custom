@@ -38,6 +38,7 @@ public final class BdaFloat64 extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public byte[] getValue() {
@@ -49,10 +50,11 @@ public final class BdaFloat64 extends BasicDataAttribute {
       throw new IllegalArgumentException("value does not have length 9");
     }
     this.value = value;
+    setValueSet();
   }
 
   public Double getDouble() {
-    if (value == null) {
+    if (!isValueSet() || value == null) {
       return null;
     }
     return Double.longBitsToDouble(
@@ -68,10 +70,12 @@ public final class BdaFloat64 extends BasicDataAttribute {
 
   public void setDouble(Double value) {
     this.value = ByteBuffer.allocate(1 + 8).put((byte) 11).putDouble(value).array();
+    setValueSet();
   }
 
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[] {11, 0, 0, 0, 0, 0, 0, 0, 0};
   }
 
@@ -106,6 +110,7 @@ public final class BdaFloat64 extends BasicDataAttribute {
           ServiceError.TYPE_CONFLICT, "expected type: floating_point as an octet string of size 9");
     }
     value = data.getFloatingPoint().value;
+    setValueSet();
   }
 
   @Override
@@ -122,11 +127,12 @@ public final class BdaFloat64 extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + getDouble();
+    return formatToString("" + getDouble());
   }
 
   @Override
   public String getValueString() {
-    return "" + Arrays.toString(value);
+    String valueString = value == null ? "null" : Arrays.toString(value);
+    return formatValueString(valueString);
   }
 }

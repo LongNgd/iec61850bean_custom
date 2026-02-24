@@ -27,6 +27,7 @@ public final class BdaCheck extends BdaBitString {
   }
 
   public void setSynchrocheck(boolean synchrocheck) {
+    setValueSet();
     if (synchrocheck) {
       value[0] = (byte) (value[0] | 0x80);
     } else {
@@ -39,6 +40,7 @@ public final class BdaCheck extends BdaBitString {
   }
 
   public void setInterlockCheck(boolean interlockCheck) {
+    setValueSet();
     if (interlockCheck) {
       value[0] = (byte) (value[0] | 0x40);
     } else {
@@ -63,6 +65,6 @@ public final class BdaCheck extends BdaBitString {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + String.format("0x%x", value[0]);
+    return formatToString(String.format("0x%x", value[0]));
   }
 }

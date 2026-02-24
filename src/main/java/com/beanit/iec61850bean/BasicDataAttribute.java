@@ -32,6 +32,7 @@ public abstract class BasicDataAttribute extends FcModelNode {
   boolean dchg;
   boolean qchg;
   boolean dupd;
+  boolean valueSet = false;
 
   protected BasicDataAttribute(
       ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
@@ -40,6 +41,8 @@ public abstract class BasicDataAttribute extends FcModelNode {
     this.sAddr = sAddr;
     this.dchg = dchg;
     this.dupd = dupd;
+
+    valueSet = false;
 
     if (dchg) {
       chgRcbs = new ArrayList<>();
@@ -94,6 +97,30 @@ public abstract class BasicDataAttribute extends FcModelNode {
   }
 
   public abstract void setDefault();
+
+  protected void setValueSet() {
+    valueSet = true;
+  }
+
+  protected void clearValueSet() {
+    valueSet = false;
+  }
+
+  protected void copyValueSetFrom(BasicDataAttribute bda) {
+    valueSet = bda.valueSet;
+  }
+
+  public boolean isValueSet() {
+    return valueSet;
+  }
+
+  protected String formatValueString(String valueString) {
+    return valueSet ? valueString : "";
+  }
+
+  protected String formatToString(String valueString) {
+    return getReference().toString() + ": " + (valueSet ? valueString : "null");
+  }
 
   @Override
   public List<BasicDataAttribute> getBasicDataAttributes() {

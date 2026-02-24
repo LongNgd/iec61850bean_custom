@@ -54,10 +54,11 @@ public final class BdaEntryTime extends BasicDataAttribute {
           (byte) (days >> 8),
           (byte) days
         };
+    setValueSet();
   }
 
   public long getTimestampValue() {
-    if (value.length != 6) {
+    if (!isValueSet() || value.length != 6) {
       return -1;
     }
     return (((value[0] & 0xffl) << 24)
@@ -75,6 +76,7 @@ public final class BdaEntryTime extends BasicDataAttribute {
       value = new byte[srcValue.length];
     }
     System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    copyValueSetFrom(bda);
   }
 
   public byte[] getValue() {
@@ -83,11 +85,13 @@ public final class BdaEntryTime extends BasicDataAttribute {
 
   public void setValue(byte[] value) {
     this.value = value;
+    setValueSet();
   }
 
   /** Sets EntryTime to byte[6] with all zeros */
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[6];
   }
 
@@ -121,6 +125,7 @@ public final class BdaEntryTime extends BasicDataAttribute {
       throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: binary_time/EntryTime");
     }
     value = data.getBinaryTime().value;
+    setValueSet();
   }
 
   @Override
@@ -132,11 +137,11 @@ public final class BdaEntryTime extends BasicDataAttribute {
 
   @Override
   public String toString() {
-    return getReference().toString() + ": " + getTimestampValue();
+    return formatToString("" + getTimestampValue());
   }
 
   @Override
   public String getValueString() {
-    return "" + getTimestampValue();
+    return formatValueString("" + getTimestampValue());
   }
 }

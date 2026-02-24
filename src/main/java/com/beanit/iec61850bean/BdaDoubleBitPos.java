@@ -25,6 +25,7 @@ public final class BdaDoubleBitPos extends BdaBitString {
   /** Sets the value to DoubleBitPos.OFF */
   @Override
   public void setDefault() {
+    clearValueSet();
     value = new byte[] {0x40};
   }
 
@@ -60,6 +61,7 @@ public final class BdaDoubleBitPos extends BdaBitString {
   }
 
   public void setDoubleBitPos(DoubleBitPos doubleBitPos) {
+    setValueSet();
     if (doubleBitPos == DoubleBitPos.BAD_STATE) {
       value[0] = (byte) 0xC0;
     } else if (doubleBitPos == DoubleBitPos.ON) {
@@ -73,7 +75,7 @@ public final class BdaDoubleBitPos extends BdaBitString {
 
   @Override
   public String getValueString() {
-    return getDoubleBitPos().toString();
+    return formatValueString(getDoubleBitPos().toString());
   }
 
   public enum DoubleBitPos {

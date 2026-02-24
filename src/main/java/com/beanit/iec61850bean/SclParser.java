@@ -1360,10 +1360,10 @@ public class SclParser {
           val = node.getTextContent();
         }
       }
-      if (val == null) {
-        // insert value from DA element
-        val = dattr.value;
-      }
+    }
+    if (val == null) {
+      // insert value from DA element
+      val = dattr.value;
     }
 
     if (bType.equals("BOOLEAN")) {
